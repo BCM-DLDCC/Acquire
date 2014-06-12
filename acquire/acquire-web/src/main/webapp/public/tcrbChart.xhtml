@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  template="../templates/template.xhtml">
+
+  <ui:define name="body">
+<h:outputScript library = "js" name="acquireGeneral.js"/>
+   <h1>Specimen by Disease Type</h1>
+<h:form id="chart" >
+      <p:pieChart value="#{diseaseChart.diseaseModel}" legendPosition="ne" 
+        title="Samples by Disease Type" showDataLabels="true" style = "height: 600px;" extender="chartTweak"/>
+</h:form>
+  </ui:define>
+
+</ui:composition>

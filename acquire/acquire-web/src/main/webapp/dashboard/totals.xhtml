@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	<p:panelGrid styleClass = "#{altStyle}">
+	
+		<f:facet name = "header">
+			<p:row>
+				<p:column>Total Tumors Submitted</p:column>
+				<p:column>Primary Untreated Tumors</p:column>
+				<p:column>Tumors with a Matched Normal</p:column>
+				<p:column>&#8805; 60% Tumor Nuclei</p:column>
+				<p:column>&#8804; 20% Necrosis</p:column>
+				<p:column>Warm Ischemia Time &#8804; 60 min</p:column>
+				<p:column>Potentially Qualifying Tumors</p:column>
+				<p:column>TCGA Qualified Tumors</p:column>			
+			</p:row>
+		
+		</f:facet>
+		
+		<p:row>
+			<p:column style = "text-align: center;">#{scoreboard.totalSamples}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.untreated}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.matchedNormal}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.percentTumor}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.percentNecrosis}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.time}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.potential}</p:column>
+			<p:column style = "text-align: center;">#{scoreboard.qualified}</p:column>
+		</p:row>
+	
+	</p:panelGrid>
+</ui:composition>
+

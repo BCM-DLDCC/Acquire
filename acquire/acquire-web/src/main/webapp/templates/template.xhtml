@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:rich="http://richfaces.org/rich" >
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="-1" />
+	<meta http-equiv="Cache-Control" content="no-cache" />
+	<meta http-equiv="Cache-Control" content="no-store" />
+	<meta http-equiv="Cache-Control" content="post-check=0" />
+	<title><ui:insert name="title">Acquire 2.x</ui:insert></title>
+	<h:outputStylesheet library="css" name="main.css" />
+	<script type="text/javascript">
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	  ga('create', 'UA-47015216-1', 'bcm.edu');
+	  ga('send', 'pageview');
+	</script>
+</h:head>
+<h:body>
+<rich:jQuery rendered="false" />
+<f:view>
+  <ui:insert name="metadata" />
+	<div id="bodyContainer">
+		<div class="menu">
+			<ui:include src="/templates/menu.xhtml" />
+		</div>
+		<div class="head">
+			<ui:include src="/templates/head.xhtml" />
+		</div>
+		<div class="body">
+			<ui:insert name="body" />
+		</div>
+		<div class="footer">
+			<hr width="100%" />
+			&#169; 2012-2013 Biomedical Informatics Group, Dan L. Duncan Cancer Center, Baylor College of Medicine
+		</div>
+	</div>
+	</f:view>
+</h:body>
+</html>
+

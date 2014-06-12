@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:api="urn:java:edu.bcm.dldcc.big.acquire.qualifiers"
+ xmlns:common="urn:java:edu.bcm.dldcc.big.annotations.qualifier"
+ xmlns:s="urn:java:ee"
+ xmlns:mail="urn:java:org.jboss.seam.mail.core"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
+ <interceptors>
+  <class>org.jboss.seam.security.SecurityInterceptor</class>
+ </interceptors>
+ <alternatives>
+  <class>edu.bcm.dldcc.big.security.FallbackIdentitySessionProducer</class>
+  <class>edu.bcm.dldcc.big.security.DldccJpaIdentityStoreConfiguration</class>
+ </alternatives>
+ <s:String>
+  <s:Produces/>
+  <common:CAS/>
+  <s:value>${casLogoutUrl}</s:value>
+ </s:String>
+ <s:String>
+  <s:Produces/>
+  <api:CaTissue/>
+  <s:Named>caTissueUrl</s:Named>
+  <s:value>${caTissueUrl}</s:value>
+ </s:String>
+ <s:String>
+  <s:Produces/>
+  <s:Named>serverName</s:Named>
+  <s:value>${appServer}</s:value>
+ </s:String>
+ <s:String>
+  <s:Produces/>
+  <s:Named>supportAddress</s:Named>
+  <s:value>${supportAddress}</s:value>
+ </s:String>
+ <s:String>
+  <s:Produces/>
+  <s:Named>supportName</s:Named>
+  <s:value>${supportName}</s:value>
+ </s:String>
+ <mail:MailConfig serverHost="serverUrl"
+  serverPort="25">
+  <s:modifies/>
+ </mail:MailConfig>
+ 
+</beans>

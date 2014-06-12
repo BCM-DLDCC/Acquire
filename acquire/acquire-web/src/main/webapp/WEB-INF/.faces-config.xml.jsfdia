@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROCESS model-entity="JSFProcess">
+ <PROCESS-ITEM NAME="rules:#minerResult.xhtml" PATH="/minerResult.xhtml"
+  SHAPE="32,17,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#minerResult.xhtml:0" NAME="item"
+   PATH="/minerResult.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID=":#{applicationManager.initApplication}:#apply.xhtml"
+    NAME="output" PATH="/apply.xhtml" TARGET="rules:#apply.xhtml"
+    TITLE="#{applicationManager.initApplication}:[any]" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID=":#{searchManager.reset}:#miner.xhtml"
+    NAME="output1" PATH="/miner.xhtml" TARGET="rules:#miner.xhtml"
+    TITLE="#{searchManager.reset}:[any]" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+ <PROCESS-ITEM NAME="rules:#apply.xhtml" PATH="/apply.xhtml"
+  SHAPE="240,33,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#miner.xhtml" PATH="/miner.xhtml"
+  SHAPE="32,129,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#miner.xhtml:0" NAME="item"
+   PATH="/miner.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT
+    ID=":#{searchManager.runCount}:#minerResult.xhtml" NAME="output"
+    PATH="/minerResult.xhtml" TARGET="rules:#minerResult.xhtml"
+    TITLE="#{searchManager.runCount}:[any]" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
+</PROCESS>

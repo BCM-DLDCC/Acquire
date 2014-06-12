@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+<ui:composition template="./templates/template.xhtml">
+	<ui:define name="body">
+	<h:messages/>
+	    <p>The application has encountered an error: "#{resources.errorMessage}". 
+	    Please follow the link to the homepage before continuing to use
+	    the application. If you encounter the error again, please report to 
+	    Acquire support the error message that you received and the function you 
+	    were performing in Acquire just prior to receiving the error message .  
+	    If the function occurs with a specific specimen ID, if possible please 
+	    include it in the report.
+	     </p>
+
+<p>Thank you,<br/>
+TCRBsupport <br/>
+<h:link value="TCRB Acquire support" 
+      src="mailto:tcrbsupport@breastcenter.tmc.edu" />
+      </p>
+	</ui:define>
+	
+</ui:composition>
+</html>

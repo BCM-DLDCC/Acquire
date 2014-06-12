@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:fieldset id="dashboardContainer" legend="Dashboard"
+		toggleable="TRUE" toggleSpeed="500" rendered="#{identity.loggedIn}">
+		<p:tabView id="dashboard" dynamic="true" >
+
+			<p:tab title="Announcements and Alerts">
+				<ui:include src="/dashboard/announcements.xhtml" />
+			</p:tab>
+
+			<p:tab title="Collection Overview">
+				<ui:include src="/dashboard/totals.xhtml">
+					<ui:param name="scoreboard" value="#{totalScores}" />
+				</ui:include>
+			</p:tab>
+
+			<p:tab title="Specimen by Collection Site">
+				<ui:include src="/dashboard/site.xhtml">
+					<ui:param name="sites" value="#{siteScores}" />
+				</ui:include>
+			</p:tab>
+
+			<p:tab title="Specimen By Disease">
+				<ui:include src="/dashboard/disease.xhtml">
+					<ui:param name="diseases" value="#{diseaseScores}" />
+				</ui:include>
+			</p:tab>
+
+		</p:tabView>
+
+		<br style="clear: both;" />
+
+	</p:fieldset>
+
+	<br style="clear: both;" />
+</ui:composition>

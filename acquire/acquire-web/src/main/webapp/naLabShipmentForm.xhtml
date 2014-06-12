@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces"
+	xmlns:sf="http://java.sun.com/jsf/composite/components/seamfaces"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+	<f:loadBundle basename="acquireMessages" var="msg"/>
+	<p:breadCrumb>
+      <p:menuitem value="Home" url="./index.jsf" />
+      <p:menuitem value="Shipment Form Search" url="./shipmentSearch.jsf?cid=#{conversation.id}" />
+
+    </p:breadCrumb>
+    <br />
+    <h:form id="shipmentForm">
+    
+    <p:growl life = "4000" id="messages"/>
+    
+		<h1>NA Lab Shipment Form</h1>
+		
+		
+			
+  <h:panelGrid columns="4">
+  <h:panelGroup>
+  <p:outputLabel value="Collection Site" for="collectionSiteMenu"/>
+  <p:selectOneMenu value="#{naLabShipmentForm.shipment.collectionSite}"
+        style="width: 204px; top: 6px; border-collapse: collapse;" 
+        converter="objectConverter" required="true"
+        id="collectionSiteMenu">
+        <f:selectItem itemLabel="Select a site..." itemValue="" />
+        <f:selectItems value="#{acquireSiteList}" var="site"
+        itemLabel="#{site.name}"/>
+      </p:selectOneMenu>
+      </h:panelGroup>
+      <h:panelGroup>
+			<p:outputLabel value="Preparer Name" for="collaboratorInput"/>
+			<p:inputText
+				value="#{naLabShipmentForm.shipment.externalCollaborator}" 
+				required="true" 
+				id="collaboratorInput"/>
+				</h:panelGroup>
+				<h:panelGroup>
+			<p:outputLabel value="External Shipping Id Number" for="shippingIdInput"/>
+			<p:inputText
+				value="#{naLabShipmentForm.shipment.externalShippingId}"
+				id="shippingIdInput" />
+				</h:panelGroup>
+		</h:panelGrid>
+<p:scrollPanel mode="native">
+		<p:dataTable id="tissueTable" paginatorPosition="bottom"
+			paginator="true" var="result" style = "overflow: scroll;"
+			value="#{naLabShipmentForm.shipment.samples}" rows="10"
+			widgetVar="tissueTableWidg" styleClass="report" editable="true"
+			currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+			
+			<f:facet name="header">Tissue Section</f:facet>
+			
+			<p:column id="boxLocation" headerText="Box Location" width="60">
+
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.boxLocation}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:selectOneMenu value="#{result.boxLocation}"
+						style="top: 6px;">
+							<f:selectItems value="#{boxLocations}" var="location" 
+							itemValue="#{location}"/>
+						</p:selectOneMenu>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="diseaseType" headerText="Disease Type" width="120">
+				<h:outputText value="#{result.diseaseType}" />
+			</p:column>
+
+			<p:column id="barcode" headerText="Tube Barcode" width="100">
+				<h:outputText value="#{result.tubeBarcode}" />
+			</p:column>
+
+			<p:column id="sampleId" headerText="Sample ID" width="100">
+				<h:outputText value="#{result.sampleId}" />
+			</p:column>
+
+			<p:column id="individualId" headerText="Individual ID" width="100">
+				<h:outputText value="#{result.patientId}" />
+			</p:column>
+
+			<p:column id="sampleType" headerText="Sample Type" width="175">
+				<p:cellEditor>
+					<f:facet name="output">
+						 <h:outputText value="#{empty result.type ? 'Please select a sample type before exporting' : result.type.value}" 
+						 styleClass="#{empty result.type ? 'required' : ' '}"/>
+					</f:facet>
+					<f:facet name="input">
+						<p:selectOneMenu value="#{result.type}"
+						style="top: 6px;">
+							<f:selectItems value="#{tissueSampleTypes}" var="type" 
+							itemLabel="#{type.value}" itemValue="#{type}"/>
+						</p:selectOneMenu>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="patientRole" headerText="Patient Role" width="150">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.role.value}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:selectOneMenu value="#{result.role}">
+							<f:selectItems value="#{patientRoles}" var="type"
+							itemLabel="#{type.value}" itemValue="#{type}" />
+						</p:selectOneMenu>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="proband" headerText="Relationship with Proband"
+				width="175">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.relationship.value}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:selectOneMenu value="#{result.relationship}">
+							<f:selectItems value="#{probandRelationships}" var="type" 
+							itemLabel="#{type.value}" itemValue="#{type}"/>
+						</p:selectOneMenu>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="collectionDate" headerText="Collection Date" width="75">
+				<h:outputText value="#{result.collectionDate}">
+					<f:convertDateTime pattern="M/d/yy" />
+				</h:outputText>
+			</p:column>
+
+			<p:column id="preservative" headerText="Preservative" width="75">
+				<h:outputText value="#{result.preservative}" />
+			</p:column>
+
+			<p:column id="liquidAmount"
+				headerText="Estimated amount of liquid in the tube (ml)" width="75">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.liquidAmount}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{result.liquidAmount}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="collectionSite" headerText="Sample collection site"
+				width="90">
+				<h:outputText value="#{result.collectionSite}" />
+			</p:column>
+
+			<p:column id="cellAmount"
+				headerText="Estimated amount of cells or tumor in the tube (mg)"
+				width="50">
+				<h:outputText value="#{result.cellAmount}" />
+			</p:column>
+
+			<p:column id="comments" headerText="Comments" width="200">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.comments}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputTextarea rows="3" value="#{result.comments}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			
+			<p:column headerText="Edit" width="50">
+        <p:rowEditor />
+      </p:column>
+
+			<p:column id="remove" width="100">
+				<p:commandButton value="Remove" icon="ui-icon-minus"
+					action="#{naLabShipmentForm.shipment.removeSample(result)}"
+					process="@this"
+					update="tissueTable" />
+			</p:column>
+
+		</p:dataTable>
+		</p:scrollPanel>
+		<p:scrollPanel mode="native">
+		<p:dataTable id="bloodTable" paginatorPosition="bottom"
+      paginator="true" var="result" 
+      value="#{naLabShipmentForm.shipment.bloodSamples}" rows="10"
+      widgetVar="bloodTableWidg" styleClass="report" editable="true"
+      currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+      paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+      
+      <f:facet name="header">Body Fluid Section</f:facet>
+
+      <p:column id="diseaseType" headerText="Disease Type" width="120">
+        <h:outputText value="#{result.diseaseType}" />
+      </p:column>
+
+      <p:column id="barcode" headerText="Tube Barcode" width="100">
+        <h:outputText value="#{result.tubeBarcode}" />
+      </p:column>
+
+      <p:column id="sampleId" headerText="Sample ID" width="100">
+        <h:outputText value="#{result.sampleId}" />
+      </p:column>
+
+      <p:column id="individualId" headerText="Individual ID" width="100">
+        <h:outputText value="#{result.patientId}" />
+      </p:column>
+
+      <p:column id="sampleType" headerText="Sample Type" width="175"
+      >
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{empty result.type ? 'Please select a sample type before exporting' : result.type.value}" 
+             styleClass="#{empty result.type ? 'required' : ' '}"/>
+          </f:facet>
+          <f:facet name="input">
+            <p:selectOneMenu value="#{result.type}">
+              <f:selectItems value="#{fluidSampleTypes}" var="type" 
+              itemLabel="#{type.value}" itemValue="#{type}"/>
+            </p:selectOneMenu>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column id="patientRole" headerText="Patient Role" width="125">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{result.role.value}" />
+          </f:facet>
+          <f:facet name="input">
+            <p:selectOneMenu value="#{result.role}">
+              <f:selectItems value="#{patientRoles}" var="type"
+              itemLabel="#{type.value}"  itemValue="#{type}"/>
+            </p:selectOneMenu>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column id="proband" headerText="Relationship with Proband"
+        width="175">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{result.relationship.value}" />
+          </f:facet>
+          <f:facet name="input">
+            <p:selectOneMenu value="#{result.relationship}">
+              <f:selectItems value="#{probandRelationships}" var="type" 
+              itemLabel="#{type.value}" itemValue="#{type}"/>
+            </p:selectOneMenu>
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+      <p:column id="collectionDate" headerText="Collection Date" width="75">
+        <h:outputText value="#{result.collectionDate}">
+          <f:convertDateTime pattern="M/d/yy" />
+        </h:outputText>
+      </p:column>
+
+      <p:column id="preservative" headerText="Preservative" width="75">
+        <h:outputText value="#{result.preservative}" />
+      </p:column>
+
+      <p:column id="liquidAmount"
+        headerText="Estimated amount of liquid in the tube (ml)" width="75">
+         <h:outputText value="#{result.liquidAmount}" />
+          
+      </p:column>
+
+      <p:column id="comments" headerText="Comments" width="200">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{result.comments}" />
+          </f:facet>
+          <f:facet name="input">
+            <p:inputTextarea rows="3" value="#{result.comments}" />
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+      
+      <p:column headerText="Edit" width="50">
+        <p:rowEditor />
+      </p:column>
+
+      <p:column id="remove" width="100">
+        <p:commandButton value="Remove" icon="ui-icon-minus"
+          action="#{naLabShipmentForm.shipment.removeSample(result)}"
+          process="@this"
+          update="bloodTable" />
+      </p:column>
+
+    </p:dataTable>
+    </p:scrollPanel>
+    <h:panelGroup>
+		<p:outputLabel value="Title" for="titleInput"/>
+			<p:inputText value="#{naLabShipmentForm.shipment.title}" required="true"
+		 id="titleInput"/>
+		</h:panelGroup>
+		
+		<h:panelGrid columns="3">
+		  <p:commandButton id="clearButton" value="Clear Samples" 
+		  action="#{naLabShipmentForm.clearShipment}" process="@this"
+		  update="tissueTable, bloodTable" />
+		  <p:commandButton value="Save" action="#{naLabShipmentForm.saveShipment}" 
+		  update="messages"/>
+		  
+		  <p:commandButton   id="btnExcel" value="#{msg['shipment.export']}"   
+				ajax="false" 
+				onclick="PrimeFaces.monitorDownload(start, stop)" icon="ui-icon-arrowthick-1-s">
+        			<p:fileDownload value="#{naLabShipmentFile.file}" />
+				</p:commandButton>
+		  
+		</h:panelGrid>
+		</h:form>
+		<span class="required">* Data elements with an asterisk must contain data prior to saving the form.</span>
+	</ui:define>
+
+</ui:composition>

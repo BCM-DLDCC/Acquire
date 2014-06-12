@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<ui:repeat var="site" value="#{diseases}">
+    <p:panel toggleable="true"  header="#{site.name} - #{site.totalSamples} Total : #{site.qualified} Qualified" collapsed = "true">
+      <span class = "siteHeader">Disease Site Totals<br/></span>
+
+      <ui:include src="/dashboard/totals.xhtml">
+        <ui:param name="scoreboard" value="#{site}" />
+      </ui:include>
+      
+    </p:panel>
+  </ui:repeat>
+  
+</ui:composition>
+

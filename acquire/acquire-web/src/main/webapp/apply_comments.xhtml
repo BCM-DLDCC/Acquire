@@ -1,0 +1,178 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<ui:remove><!-- Chris in using  his css ,to remove all inline styles,scripts --></ui:remove>
+		
+	<style>
+	.ui-widget-content .ui-datalist-content {
+		/* needed to remove border around child comments*/
+    	border: none;
+    	background: transparent;
+    	background-image: none;
+	}
+	
+	.childComDiv .ui-panel {
+	border: none !important;
+	}
+	</style>
+	
+		<p:outputPanel id="commentsPanel" styleClass="emptyCommentsPanel" style="display:block;">
+				<p:panel style="border:0px;">
+				 <p:dataList id="commentsdl" value="#{comments}" var="comment" type="none">
+					<p:column>
+						<h:panelGroup  rendered="#{not empty  comment.text}" styleClass="minerBorder">
+							<div style="clear: both" />
+								<h:panelGrid columns="1" style="float:left; padding:3px;">
+									<h:panelGroup>
+										<h:outputText value="#{msg['rac.apply.comments']} #{comment.user.firstName} #{comment.user.lastName}, "/>
+										<h:outputText style="font-size:small;" value="#{comment.timestamp}">
+											<f:convertDateTime pattern="EEE, MMM d,''yy '@'hh:mm a" />
+										</h:outputText>
+									</h:panelGroup>
+									<p:column>
+										<p:panel style="margin:2px;" >
+										 	<h:outputText escape="false" value="#{comment.text}"/>
+										 	<p></p>
+										 		<p:commandButton style="float:left;"
+											 	rendered="#{(empty comment.children or comment.children.size eq 0) and (application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}"
+											 	id="deleteCommentButton" 
+											 	action="#{applicationManager.deleteComment(comment)}"
+									            ajax="true"
+									            icon="ui-icon-trash"
+									            value="#{msg['delete.comment']}"
+									            update="@form"
+									            onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()"
+									            >
+									            </p:commandButton>
+									          <p:commandButton  rendered="#{ (application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}"
+											 	style="float: right"
+									          	id="addChildCommentButton" 
+											 	action="#{applicationManager.addChildComment(comment)}"
+									            ajax="true"
+									            icon="ui-icon-comment"
+									             value="#{msg['reply.comment']}"
+									            update="@form"
+									           	onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()"
+									            >
+									            <f:setPropertyActionListener value="#{true}" target="#{requestScope.addingNewChildComment}" />
+												</p:commandButton>
+								        </p:panel>
+									</p:column>
+									<p:column>
+										<p:outputPanel  rendered="#{not empty comment.children and comment.children.size gt 0}">
+											<p:dataList style="margin-left:80px;" id="childCommentsdl" value="#{comment.children}" var="childComment" type="none">
+												 <p:column>
+												  	<div style="clear: both" />
+												  	
+												 	<p:panel style="margin-left:80px;border:0px;">
+														<h:panelGroup rendered="#{not empty childComment.text}">
+													  		<div style="clear: both" />
+															<h:panelGrid columns="1" >
+																<h:panelGroup>
+																	<h:outputText value="#{msg['rac.apply.comments']} #{childComment.user.firstName} #{childComment.user.lastName}, "/>
+																	<h:outputText value="#{childComment.timestamp}">
+																		<f:convertDateTime  pattern="EEE, MMM d,''yy '@'hh:mm a" />
+																	</h:outputText>
+																</h:panelGroup>
+																<p:column>
+																	 <p:panel  style="margin:2px;" >
+																	 	<h:outputText escape="false" value="#{childComment.text}"/>
+																	 	<p></p>
+																	 	<p:commandButton style="float: right"
+																	 	rendered="#{(empty childComment.children or childComment.children.size eq 0) and ((application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW'))}"
+																	 	id="deleteChildCommentButton" 
+																	 	action="#{applicationManager.deleteChildComment(childComment,comment)}"
+															            ajax="true"
+															            icon="ui-icon-trash"
+															            value="#{msg['delete.comment']}"
+															          	 update="@form"
+															            onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()" 
+															           />
+															         
+															         </p:panel>
+																</p:column>
+															</h:panelGrid>
+														</h:panelGroup>
+												      
+												      	<p:outputPanel 
+												      	rendered="#{empty childComment.text and (application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}" 
+												      	id="childCommentsPanel">
+												         	<div style="clear: both" />
+															 <p:panelGrid columns="1">
+														 		<p:editor controls="bold italic underline strikethrough font size style color undo  center justify bullets numbering indent outdent"
+																width="800"	height="90"  id="newChildComment" value="#{childComment.text}"/>  
+																<p:watermark for="newChildComment" 
+																value="Maximum of 255 characters allowed." />
+																
+																<f:facet name="footer">
+																	<p:commandButton  style="float: left;"
+																	rendered="#{(application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}"
+																	id="cancelNewChildCommentButton" 
+																 	action="#{applicationManager.deleteChildComment(childComment,comment)}"
+																 	 ajax="true"
+														            icon="ui-icon-comment"
+														             value="#{msg['cancel.comment']}"
+														           update="@form"
+														            onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()"
+														            > 
+														           <f:setPropertyActionListener value="#{false}" target="#{requestScope.addingNewChildComment}" />
+											
+														          </p:commandButton>
+														          
+																	<p:commandButton  style="float: right;"
+																	rendered="#{(application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}"
+																	id="newCommentButton" 
+																 	action="#{applicationManager.processComment(childComment)}"
+																 	 ajax="true"
+														            icon="ui-icon-comment"
+														             value="#{msg['submit.reply']}"
+														            update="@form"
+														           onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()"
+														            >
+														           <f:setPropertyActionListener value="#{false}" target="#{requestScope.addingNewChildComment}" />
+											
+														          </p:commandButton>
+													          </f:facet>
+													         </p:panelGrid>
+															</p:outputPanel>
+														
+													 </p:panel>
+								          		</p:column>
+											 </p:dataList>
+										</p:outputPanel>
+									</p:column>
+								</h:panelGrid>
+								
+							</h:panelGroup>
+							
+								<div style="clear:both;"/>
+								<h:panelGroup rendered="#{ (not requestScope.addingNewChildComment) and empty comment.text }" styleClass="minerBorder">
+									 <p:panelGrid columns="1" styleClass="minerBorder" 
+									 rendered="#{(application.applicationStatus eq 'SUBMITTED' or application.applicationStatus eq 'IN_REVIEW')}">
+									 	<h:outputText value="Add a comment:"/>
+								 		<p:editor controls="bold italic underline strikethrough font size style color undo  center justify bullets numbering indent outdent"
+										width="800"	height="90" id="newComment" value="#{comment.text}"/>  
+										<p:watermark for="newComment" 
+										value="Maximum of 255 characters allowed." />
+										
+										<f:facet name="footer">
+											<p:commandButton  style="float: right;"
+											id="newCommentButton" 
+										 	action="#{applicationManager.processComment(comment)}"
+								            ajax="true"
+								            icon="ui-icon-comment"
+								            value="#{msg['submit.comment']}"
+								            update="@form"
+								           	onstart="commentsBlock.show()" oncomplete="commentsBlock.hide()"
+								            />
+								      </f:facet>
+							 		</p:panelGrid>
+								</h:panelGroup>	 
+					</p:column>
+				 </p:dataList>
+				</p:panel>
+			 </p:outputPanel>	
+	</ui:composition>

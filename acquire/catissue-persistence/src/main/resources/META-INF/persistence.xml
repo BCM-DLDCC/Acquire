@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd ">
+	<persistence-unit name="caTissueBase">
+		<jta-data-source>java:/jdbc/caTissueBase</jta-data-source>
+		<mapping-file>META-INF/orm.xml</mapping-file>
+		<mapping-file>META-INF/queries.xml</mapping-file>
+		<class>edu.bcm.dldcc.big.utility.entity.CatissueAuditEvent</class>
+		<class>edu.bcm.dldcc.big.utility.entity.CatissueAuditEventDetail</class>
+		<class>edu.bcm.dldcc.big.utility.entity.CatissueAuditEventLog</class>
+		<class>edu.bcm.dldcc.big.utility.entity.CatissueAuditEventQueryLog</class>
+		<class>edu.bcm.dldcc.big.utility.entity.NewParticipantLog</class>
+		<class>edu.bcm.dldcc.big.utility.entity.NewSiteLog</class>
+		<class>edu.bcm.dldcc.big.utility.entity.NewSpecimenLog</class>
+		<properties>
+			<property name="hibernate.dialect" 
+			  value="org.hibernate.dialect.Oracle10gDialect" />
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="true" />
+			<property name="hibernate.use_sql_comments" value="false" />
+			<property name="hibernate.cache.use_second_level_cache"
+				value="true" />
+			<property name="hibernate.cache.region.factory_class" 
+			 value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory" />
+		</properties>
+
+	</persistence-unit>
+	
+</persistence>

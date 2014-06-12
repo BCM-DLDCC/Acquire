@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces">
+
+	<h1>Pathology</h1>
+
+	<h:form id="pathologyForm">
+		<div>
+<p:outputPanel id="searchPanel">
+			<p:inputText id="tumorSearch"
+				style="position: relative; bottom: 8px; margin-right: 10px;"
+				value="#{reportManager.searchTerm}" 
+				converter="#{reportManager.searchField.valueConverter}"/>
+			<p:watermark for="tumorSearch" value="Search for tumor specimen" />
+			<p:outputLabel for="pathFieldsDropdown" value="Search by: "
+				style="position: relative; bottom:8px;" />
+			<p:selectOneMenu value="#{reportManager.searchField}"
+				style="width: 188px;" id="pathFieldsDropdown">
+				<f:selectItems value="#{reportManager.getSearchFields}" />
+				<p:ajax event="change" update="searchPanel" process="searchPanel"/>
+			</p:selectOneMenu>
+</p:outputPanel>
+			<p:commandButton value="Go"
+				action="#{reportManager.runPathologyReport}"
+				styleClass="pathSearchButton" id="pathSearchButton"
+				update=":mainContent:tumorForm,:mainContent:aliquotForm,pathologyForm" />
+
+			<div style="float: right;">
+				<p:selectOneMenu value="#{reportManager.collectionSite}"
+					style="width: 204px;">
+					<f:selectItem itemLabel="All Sites" itemValue="" />
+					<f:selectItems value="#{currentSites}" />
+				</p:selectOneMenu>
+			</div>
+
+
+		</div>
+	</h:form>
+	<h:form id="tumorForm">
+		<p:growl id="messages" />
+		<p:scrollPanel mode="native">
+		<p:dataTable id="tumorTable" paginatorPosition="bottom"
+			paginator="true" var="result" editable="true"
+			value="#{reportManager.pathologyReport}" rows="10"
+			widgetVar="specimenTable" styleClass="report"
+			currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+			rowIndexVar="index"
+			rowKey="#{result.uuid}">
+
+
+			<f:facet name="header">
+			Staging Reporting
+			</f:facet>
+			
+			<p:columnGroup type="header">
+			 <p:row>
+			   <p:column rowspan="2" headerText="Acquire Specimen ID" width="150"/>
+			   <p:column rowspan="2" headerText="CaTissue ID" width="100"/>
+			   <p:column rowspan="2" headerText="Specimen Label" width="75"/>
+			   <p:column rowspan="2" headerText="MRN" width="100"/>
+			   <p:column colspan="4" headerText="Staging"/>
+			   <p:column rowspan="2" headerText="Grade" width="100"/>
+			   <p:column rowspan="2" headerText="Edit" width="50"/>
+			   <p:column rowspan="2" headerText="Pathology Report" width="180"/>
+			 </p:row>
+			 <p:row>
+			   <p:column headerText="pT" width="100"/>
+			   <p:column headerText="pN" width="100"/>
+			   <p:column headerText="pM" width="100"/>
+			   <p:column headerText="Tumor Stage" width="100"/>
+			 </p:row>
+			</p:columnGroup>
+
+			<p:column id="specId"
+				sortBy="#{result.specimenId}" width="150">
+				<h:outputText value="#{result.specimenId}" />
+			</p:column>
+
+			<p:column id="catSpecId" 
+				sortBy="#{result.inventoryId}" width="100">
+				<h:outputText value="#{result.inventoryId}" />
+			</p:column>
+
+			<p:column id="specType" width="75"
+				sortBy="#{result.specimenLabel}">
+				<h:outputText value="#{result.specimenLabel}" />
+			</p:column>
+
+			<p:column id="patientId" width="100"
+				sortBy="#{result.concatenatedMrn}">
+				<h:outputText value="#{result.concatenatedMrn}" />
+			</p:column>
+
+			<p:column id="stagingPT" width="100"
+				sortBy="#{result.stagingT}">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.stagingT}" />
+					</f:facet>
+					<f:facet name="input">
+
+						<h:selectOneMenu value="#{result.stagingT}" style="width:70px;"
+							converter="objectConverter">
+							<f:selectItem itemLabel="Select..." itemValue="#{null}" />
+							<f:selectItems value="#{tStagingList}" var="stage"
+								itemValue="#{stage}" />
+
+						</h:selectOneMenu>
+
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="pn" sortBy="#{result.stagingN}"
+				width="100">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.stagingN}" />
+					</f:facet>
+
+					<f:facet name="input">
+						<h:selectOneMenu value="#{result.stagingN}" style="width:70px;"
+							converter="objectConverter">
+							<f:selectItem itemLabel="Select..." itemValue="#{null}" />
+							<f:selectItems value="#{nStagingList}" var="stage"
+								itemValue="#{stage}" />
+
+						</h:selectOneMenu>
+
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="pm" sortBy="#{result.stagingM}"
+				width="100">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.stagingM}" />
+					</f:facet>
+
+					<f:facet name="input">
+						<h:selectOneMenu value="#{result.stagingM}" style="width:70px;"
+							converter="objectConverter">
+							<f:selectItem itemLabel="Select..." itemValue="#{null}" />
+							<f:selectItems value="#{mStagingList}" var="stage"
+								itemValue="#{stage}" />
+
+						</h:selectOneMenu>
+
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="stage" sortBy="#{result.tumorStage}"
+				width="100">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.tumorStage}" />
+					</f:facet>
+
+					<f:facet name="input">
+						<h:selectOneMenu value="#{result.tumorStage}" style="width:70px;"
+							converter="objectConverter">
+							<f:selectItem itemLabel="Select..." itemValue="#{null}" />
+							<f:selectItems value="#{tumorStageList}" var="stage"
+								itemValue="#{stage}" />
+
+						</h:selectOneMenu>
+
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+			
+			<p:column id="grade" sortBy="#{result.tumorGrade}"
+        width="100">
+        <p:cellEditor>
+          <f:facet name="output">
+            <h:outputText value="#{result.tumorGrade}" />
+          </f:facet>
+
+          <f:facet name="input">
+            <h:selectOneMenu value="#{result.tumorGrade}" style="width:70px;"
+              converter="objectConverter">
+              <f:selectItem itemLabel="Select..." itemValue="#{null}" />
+              <f:selectItems value="#{tumorGradeList}" var="grade"
+                itemValue="#{grade}" />
+
+            </h:selectOneMenu>
+
+          </f:facet>
+        </p:cellEditor>
+      </p:column>
+
+			<p:column width="50">
+				<p:rowEditor />
+			</p:column>
+
+			<p:column id="reportColumn" width="180">
+
+				<p:outputPanel id="reportButtons">
+					<p:commandButton id="reportButton" icon="ui-icon-document"
+						value="Attach Path Report" action="#{files.setRecord(result)}"
+						rendered="#{empty result.pathReport}"
+						oncomplete="reportDlg.show();"
+						update=":mainContent:reportUploadForm">
+						<f:setPropertyActionListener target="#{files.updateComponentId}"
+							value=":#{component.parent.clientId}" />
+					</p:commandButton>
+
+					<p:commandButton id="reportDownloadButton" value="View Path Report"
+						ajax="false" onclick="PrimeFaces.monitorDownload(start, stop)"
+						icon="ui-icon-arrowthick-1-s"
+						rendered="#{not empty result.pathReport}" style="float: left">
+						<f:setPropertyActionListener target="#{files.record}"
+							value="#{result}" />
+						<p:fileDownload value="#{files.pathReport}" />
+					</p:commandButton>
+					<p:tooltip for="reportDownloadButton" showEffect="slide"
+						hideEffect="slide" value="#{result.pathReport}" />
+					<p:commandLink onclick="reportConfirmDlg.show();" process="@this"
+						style="float: right;" rendered="#{not empty result.pathReport}">
+						<span class="ui-icon ui-icon-delete" />
+						<f:setPropertyActionListener target="#{files.record}"
+							value="#{result}" />
+					</p:commandLink>
+
+				</p:outputPanel>
+
+				<p:confirmDialog id="reportConfirm"
+					message="Confirm deletion of file" header="File Deletion"
+					severity="alert" widgetVar="reportConfirmDlg">
+					<p:commandButton value="Yes" oncomplete="reportConfirmDlg.hide();"
+						action="#{files.removePathReport}" update="tumorTable" />
+					<p:commandButton value="No" onclick="reportConfirmDlg.hide();" />
+
+				</p:confirmDialog>
+
+
+
+			</p:column>
+
+		</p:dataTable>
+    </p:scrollPanel>
+	</h:form>
+	<p:dialog header="Upload Path Report" resizable="false"
+		widgetVar="reportDlg" modal="true" id="reportDialog">
+		<h:form id="reportUploadForm">
+			<p:outputPanel id="reportUploadPanel">
+				<h:outputText id="dialogSpecimenId"
+					value="Specimen: #{files.record.specimenLabel}" />
+				<p:fileUpload id="reportUpload"
+					fileUploadListener="#{files.uploadPathReport}"
+					rendered="#{empty result.pathReport}"
+					oncomplete="reportDlg.hide();"
+					update=":mainContent:tumorForm:tumorTable,:mainContent:tumorForm:messages" />
+			</p:outputPanel>
+		</h:form>
+	</p:dialog>
+	<br />
+	<br />
+	<h:form id="aliquotForm">
+	<p:scrollPanel style="width:auto;" mode="native">
+		<p:dataTable id="aliquotTable" widgetVar="aliquotTble"
+			paginatorPosition="bottom" styleClass="report"
+			value="#{reportManager.aliquotReport}" editable="true" var="result"
+			paginator="true" rows="10"
+			currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+			rowKey="#{result.uuid}" rowIndexVar="aliquotIndex"
+			>
+
+			<f:facet name="header">
+			Cellularity of Specimens and Aliquots
+		</f:facet>
+
+			<p:column id="aliqType" headerText="Specimen Label"
+				sortBy="#{result.specimenLabel}">
+				<h:outputText value="#{result.specimenLabel}" />
+			</p:column>
+
+			<p:column id="parentLabel" headerText="Parent Specimen Label"
+				sortBy="#{result.parentLabel}">
+				<h:outputText value="#{result.parentLabel}" />
+			</p:column>
+
+			<p:column id="mrn" headerText="MRN"
+				sortBy="#{result.concatenatedMrn}">
+				<h:outputText value="#{result.concatenatedMrn}" />
+			</p:column>
+
+			<p:column id="lineage" headerText="Lineage"
+				sortBy="#{result.lineage}">
+				<h:outputText value="#{result.lineage}" />
+			</p:column>
+
+			<p:column id="stroma" headerText="% Stroma"
+				sortBy="#{result.percentStroma}">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.percentStroma}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{result.percentStroma}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="necrosis" headerText="% Necrosis"
+				sortBy="#{result.percentNecrosis}">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.percentNecrosis}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{result.percentNecrosis}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column id="nuclei" headerText="% Nuclei"
+				sortBy="#{result.percentNuclei}">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{result.percentNuclei}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:inputText value="#{result.percentNuclei}" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+			<p:column headerText="Edit">
+				<p:rowEditor />
+			</p:column>
+
+			<p:column id="imageColumn" headerText="Slide Image">
+
+				<p:outputPanel id="imageButtons">
+					<p:commandButton id="imageButton" icon="ui-icon-document"
+						value="Attach Slide Image" action="#{files.setRecord(result)}"
+						rendered="#{empty result.pathImage}" 
+						update=":mainContent:imageUploadForm"
+						oncomplete="imageDlg.show();"/>
+
+					<p:commandButton id="imageDownloadButton"
+						rendered="#{not empty result.pathImage}" value="View Slide Image"
+						ajax="false" onclick="PrimeFaces.monitorDownload(start, stop)"
+						icon="ui-icon-arrowthick-1-s" style="float: left">
+						<f:setPropertyActionListener target="#{files.record}"
+							value="#{result}" />
+						<p:fileDownload value="#{files.pathImage}" />
+					</p:commandButton>
+					<p:tooltip for="imageDownloadButton" showEffect="slide"
+						hideEffect="slide" value="#{result.pathImage}" />
+					<p:commandLink onclick="imageConfirmDlg.show();"
+						style="float: right;" rendered="#{not empty result.pathImage}">
+						<span class="ui-icon ui-icon-delete" />
+						<f:setPropertyActionListener target="#{files.record}"
+							value="#{result}" />
+					</p:commandLink>
+				</p:outputPanel>
+
+				<p:confirmDialog id="imageConfirm"
+					message="Confirm deletion of file" header="File Deletion"
+					severity="alert" widgetVar="imageConfirmDlg">
+					<p:commandButton value="Yes" oncomplete="imageConfirmDlg.hide();"
+						action="#{files.removePathImage}" update="aliquotTable" />
+					<p:commandButton value="No" onclick="imageConfirmDlg.hide();" />
+
+				</p:confirmDialog>
+
+			</p:column>
+
+
+		</p:dataTable>
+		</p:scrollPanel>
+		<br />
+		<p:commandButton value="Save Changes"
+			action="#{reportManager.saveUpdates}" id="pathSaveButton"
+			ajax="false" onclick="if(!clearPathologySubmission()) return false;" />
+
+
+	</h:form>
+	<p:dialog header="Upload Slide Image" resizable="false"
+    widgetVar="imageDlg" modal="true" id="imageDialog">
+    <h:form id="imageUploadForm">
+      <p:outputPanel id="imageUploadPanel">
+        <h:outputText id="imageDialogSpecimenId"
+          value="Specimen: #{files.record.specimenLabel}" />
+        <p:fileUpload id="imageUpload"
+          fileUploadListener="#{files.uploadPathImage}"
+          rendered="#{empty result.pathImage}"
+          oncomplete="imageDlg.hide();"
+          update=":mainContent:aliquotForm:aliquotTable,:mainContent:tumorForm:messages" />
+      </p:outputPanel>
+    </h:form>
+    
+  </p:dialog>
+	<p:blockUI block=":mainContent"
+		trigger=":mainContent:tumorForm:tumorTable,:mainContent:pathologyForm:pathSearchButton,:mainContent:pathologyForm:pathSearchButton,:mainContent:aliquotForm:aliquotTable,:mainContent:aliquotForm:pathSaveButton">
+		<h:graphicImage library="img" name="ajax-loader.gif" />
+	</p:blockUI>
+	
+</ui:composition>

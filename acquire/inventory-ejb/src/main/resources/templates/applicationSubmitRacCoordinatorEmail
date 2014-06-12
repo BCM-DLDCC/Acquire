@@ -1,0 +1,8 @@
+<html>
+<body>
+<p>
+An application status has been changed: ${name} now has the status: ${status}
+Please login at <a href="${server}"> ${server}</a> to see the application.
+</p>
+</body>
+</html>

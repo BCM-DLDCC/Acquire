@@ -1,0 +1,79 @@
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:a="http://richfaces.org/a4j">
+
+
+
+	<!--  overflow allows the dropdown menu contained below to not be hidden by the height of the above container -->
+
+<div class = "menuSection">
+
+		<!-- menu bar for logged in -->
+		<h:form>
+
+			<p:menubar styleClass="menuBar" id="menuBar">
+
+				<p:menuitem value="Home" url="/index.jsf"
+					rendered="#{identity.loggedIn}" />
+				<p:menuitem value="caTissue" url="#{caTissueUrl}"
+					target="popupWindow"
+					rendered="#{identity.loggedIn and !authorizations.isPublicUser()}" />
+				<p:menuitem value="Data Miner" url="/miner.jsf" id="minerHomeLink"
+					rendered="#{identity.loggedIn and !authorizations.isPublicUser()}"
+					onstart="menuBlock.show();" onsuccess="menuBlock.hide();" />
+				<p:menuitem value="Shipment Forms" url="/shipmentSearch.jsf"
+					rendered="#{authorizations.isShipment(currentProgram)}" />
+				<p:menuitem value="Apply for Specimen" url="/apply.jsf"
+					rendered="#{identity.loggedIn}" />
+				<p:submenu label="My Account"
+					rendered="#{identity.loggedIn}">
+					<p:menuitem value="Change Password"
+						rendered="#{!currentUser.getCaTissueUser}"
+						url="changePassword.jsf" />
+					<p:menuitem value="My Applications" url="userApplications.jsf"
+					 />
+				</p:submenu>
+				<p:submenu label="Admin"
+					rendered="#{authorizations.isAnnouncements(currentProgram) or authorizations.isAdmin(currentProgram)}">
+					<p:menuitem value="Manage Announcements" url="announcements.jsf"
+						rendered="#{authorizations.isAnnouncements(currentProgram)}" />
+					<p:menuitem value="Manage Users" url="/manageUsers.jsf"
+						rendered="#{authorizations.isAdmin(currentProgram)}" />
+					<p:menuitem value="Review Account Requests" url="/reviewUsers.jsf"
+						rendered="#{authorizations.isAdmin(currentProgram)}" />
+					<p:menuitem value="Manage Sites" url="/siteManagement.jsf"
+						rendered="#{authorizations.isSuperAdmin}" />
+				</p:submenu>
+				<p:submenu label="Help">
+					<p:menuitem value="User Guide" url="/files/Acquire2UserGuide.pdf"
+					  target="_new"
+						rendered="#{identity.loggedIn and !authorizations.isPublicUser()}" />
+						<p:menuitem value="User Guide" url="/files/Acquire2PublicUserGuide.pdf"
+						target="_new"
+            rendered="#{identity.loggedIn and authorizations.isPublicUser()}" />
+					<p:menuitem value="Email Support"
+						url="mailto:tcrbsupport@breastcenter.tmc.edu" />
+				</p:submenu>
+				<p:menuitem value="Log Out"
+					action="#{casAuthenticator.unAuthenticate}" ajax="false"
+					rendered="#{identity.loggedIn}" />
+
+
+			</p:menubar>
+
+			<p:blockUI block="menuBar" widgetVar="menuBlock">
+				<h:graphicImage library="img" name="ajax-loader.gif" />
+			</p:blockUI>
+
+		</h:form>
+
+</div>
+
+			<div class="welcomeMessage">
+				<h:outputText value="Welcome, #{credentials.username}"
+					rendered="#{identity.loggedIn}" />
+			</div>
+
+
+</ui:composition>

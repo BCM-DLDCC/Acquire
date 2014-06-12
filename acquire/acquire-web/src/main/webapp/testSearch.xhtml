@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  xmlns:s="http://jboss.org/seam/faces"
+  template="./templates/template.xhtml">
+<ui:define name="body">
+  <h1>File Test</h1>
+
+  
+  
+  <h:form id="aliquotForm">
+    
+<p:commandButton value="Testing" id="button" />
+
+<p:overlayPanel id="panel" for="button" appendToBody="true">
+
+            <p:fileUpload id="imageUpload"
+              fileUploadListener="#{files.uploadPathImage}"
+              auto="false"
+              />
+            
+              </p:overlayPanel>
+            <p:outputPanel >  
+              <p:commandButton value="Testing 2" id="button2" />
+              </p:outputPanel>
+</h:form>
+
+  </ui:define>
+  
+</ui:composition>

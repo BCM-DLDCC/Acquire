@@ -1,0 +1,173 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sf="http://java.sun.com/jsf/composite/components/seamfaces"
+	xmlns:dldcc="http://java.sun.com/jsf/composite/dldcc">
+
+	<p:panelGrid styleClass = "formTable">
+		<p:row>
+			<p:column>
+				<p:outputLabel value="First Name:" for="firstNameInput" />
+				<br />
+				<p:inputText id="firstNameInput" value="#{user.firstName}" size="25"
+					required="true" disabled="#{not edit}" label="First Name"
+					styleClass="oneCol" />
+				<p:message for=":mainForm:applyAccordian:firstNameInput" />
+			</p:column>
+
+			<p:column>
+				<p:outputLabel value="Last Name:" for="lastNameInput" />
+				<br />
+				<p:inputText id="lastNameInput" value="#{user.lastName}" size="25"
+					required="true" disabled="#{not edit}" label="Last Name"
+					styleClass="oneCol" />
+				<p:message for=":mainForm:applyAccordian:lastNameInput" />
+			</p:column>
+
+			<p:column>
+				<p:outputLabel value="Title" for="titleInput" />
+				<br />
+				<p:inputText id="titleInput" value="#{user.title}" size="5"
+					disabled="#{not edit}" styleClass="oneCol" />
+			</p:column>
+
+			<p:column>
+				<p:outputLabel value="Degree:&#x2020;" for="degreeInput" />
+				<br />
+				<p:selectOneMenu value="#{user.degree}" id="degreeInput"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					style="width:${css.oneCol}">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{degreeChoices}" var="degree"
+						itemLabel="#{degree.toString()}" itemValue="#{degree}" />
+				</p:selectOneMenu>
+				<p:message for=":mainForm:applyAccordian:degreeInput" />
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column colspan="2">
+				<p:outputLabel value="Institution Name:&#x2020;"
+					for="institutionNameInput" />
+				<br />
+				<p:inputText id="institutionNameInput"
+					value="#{user.institutionName}" disabled="#{not edit}"
+					required="#{applicationManager.submitting}"
+					label="Institution Name" styleClass="twoCol" />
+				<p:message for=":mainForm:applyAccordian:institutionNameInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Institution Type:&#x2020;"
+					for="institutionTypeInput" />
+				<br />
+				<p:selectOneMenu value="#{user.institutionType}"
+					style="width: ${css.oneCol}" id="institutionTypeInput"
+					disabled="#{not edit}" required="#{applicationManager.submitting}">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{institutionTypeChoices}" var="instType"
+						itemLabel="#{instType.toString()}" itemValue="#{instType}" />
+				</p:selectOneMenu>
+				<p:message for=":mainForm:applyAccordian:institutionTypeInput" />
+			</p:column>
+
+			<p:column>
+				<p:outputLabel value="Department:" for="departmentInput" />
+				<br />
+				<p:inputText id="departmentInput" value="#{user.department}"
+					styleClass="oneCol" disabled="#{not edit}" />
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column colspan="4">
+				<p:outputLabel value="Mailing Address:&#x2020;" for="addressInput" />
+				<br />
+				<p:inputText id="addressInput" value="#{user.address.street1}"
+					styleClass="twoCol" disabled="#{not edit}"
+					required="#{applicationManager.submitting}" />
+				<p:message for=":mainForm:applyAccordian:addressInput" />
+			</p:column>
+		</p:row>
+					
+		<p:row>
+			<p:column>
+				<p:outputLabel value="City:&#x2020;" for="cityInput" />
+				<br />
+				<p:inputText id="cityInput" value="#{user.address.city}"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					styleClass="oneCol" />
+				<p:message for=":mainForm:applyAccordian:cityInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="State:&#x2020;" for="stateInput" />
+				<br />
+				<p:selectOneMenu value="#{user.address.state}" id="stateInput"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					style="width:${css.oneCol}">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{usStates}" var="state" itemLabel="#{state}"
+						itemValue="#{state}" itemDescription="#{state.fullName}" />
+				</p:selectOneMenu>
+				<p:message for=":mainForm:applyAccordian:stateInput" />
+			</p:column>
+			<p:column colspan="2">
+				<p:outputLabel value="Zip:&#x2020;" for="zipInput" />
+				<br />
+				<p:inputText id="zipInput" value="#{user.address.zip}"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					styleClass="oneCol" />
+				<p:message for=":mainForm:applyAccordian:zipInput" />
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel value="Phone:&#x2020;" for="phoneInput" />
+				<br />
+				<p:inputText id="phoneInput" value="#{user.workPhone.value}"
+					styleClass="oneCol" disabled="#{not edit}"
+					required="#{applicationManager.submitting}" />
+				<p:message for=":mainForm:applyAccordian:phoneInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Fax:" for="faxInput" />
+				<br />
+				<p:inputText id="faxInput" value="#{user.faxNumber.value}"
+					styleClass="oneCol" disabled="#{not edit}" />
+			</p:column>
+			<p:column colspan="2">
+				<p:outputLabel value="Email" for="emailInput" />
+				<br />
+				<p:inputText id="emailInput" value="#{user.email.value}"
+					styleClass="oneCol" required="true" disabled="#{not edit}" />
+				<p:message for=":mainForm:applyAccordian:emailInput" />
+			</p:column>
+		</p:row>
+	</p:panelGrid>
+
+	<p:panel>
+	<f:facet name = "header">
+	Financial Conflict of Interest
+	</f:facet> 
+	<p:outputLabel
+		value="Do you have any significant financial conflict of interest?&#x2020;"
+		for="options" />
+	<br />
+
+	<p:selectOneRadio id="options" value="#{user.fcoi}"
+		disabled="#{not edit}" layout="pageDirection"
+		required="#{applicationManager.submitting}">
+		<f:selectItem itemLabel="Yes" itemValue="#{true}" />
+		<f:selectItem itemLabel="No" itemValue="#{false}" />
+	</p:selectOneRadio>
+	<p:message for=":mainForm:applyAccordian:options" />
+	<p>
+		If Yes, please download the
+		<h:outputLink value="files/TCRB_FCOI_PDFform.pdf" target="_new">FCOI form</h:outputLink>
+		, complete it and attach to this application at the end of the form.
+	</p>
+</p:panel>
+
+</ui:composition>

@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+		<f:loadBundle basename="acquireMessages" var="msg" />
+
+		<h:outputStylesheet name="css/apollo.css" />
+		<h:form id="mainForm">
+
+  <p:growl id="messages" />
+
+			<div class="minerBorder">
+				<!-- intro text to miner -->
+				<p:panel id="pnlIntro" style="border-width:5px;">
+					<h:outputText rendered="#{not authorizations.isPublicUser}"
+						value="#{msg['miner.search.intro']}" />
+					<h:outputText escape="false"
+						rendered="#{authorizations.isPublicUser}"
+						value="#{msg['miner.search.intro.rac']}" />
+				</p:panel>
+
+				<br></br>
+
+<h1>#{msg['miner.search.step1']}</h1>
+
+				<p:panel id="pnl">
+
+					<p:panel id="pnlLogic"
+						header="#{msg['miner.search.step1.operator.label']}"
+						toggleable="true" collapsed="false" toggleSpeed="500"
+						closeSpeed="500" widgetVar="panel0">
+						<h:outputText value="#{msg['miner.search.step1.logic.note']}" /><br/><br/> 
+							<p:selectOneListbox value="#{searchManager.operation}" id="logic">
+								<f:selectItems var="logic" value="#{searchOperatorBean.options}"
+									itemValue="#{logic}" itemLabel="#{logic.name}"
+									noSelectionLabel="Please select ..." />
+							</p:selectOneListbox>
+
+					</p:panel>
+
+
+					<p>
+						<b>#{msg['miner.search.step1.select.note']}</b>
+					</p>
+
+
+
+					<p:panel id="pnlPat"
+						header="#{msg['miner.search.step1.data.patient']}"
+						toggleable="true" collapsed="false" toggleSpeed="500"
+						closeSpeed="500" widgetVar="panel1">
+
+						<p:dataList value="#{searchManager.patientFields}"
+							var="patientField" type="none">
+							<p:column>
+
+								<h:panelGrid id="patientGrid" columns="5" cellspacing="4"
+									cellpadding="4" styleClass="minerBorder,topAlign"
+									rendered="#{patientField.visible}">
+									<p:column>
+										<h:panelGroup rendered="#{patientField.visible}">
+											<p:selectBooleanCheckbox>
+												<p:ajax
+													update="panelPatient,panelPatient2,panelPatientOps,panelPatientValues,searchOperatorsPatient,searchValuesPatient"
+													listener="#{searchManager.togglePatientSearchField(patientField)}" />
+											</p:selectBooleanCheckbox>
+											<h:outputLabel value="#{patientField.toString}" />
+										</h:panelGroup>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelPatient" layout="block">
+											<h:selectOneMenu
+												value="#{searchManager.patientFieldValues[patientField].newOperator}"
+												rendered="#{not searchManager.patientFieldValues[patientField].singleOperator and searchManager.patientFieldValues.containsKey(patientField)  and (searchManager.patientFieldValues[patientField] ne null)}">
+												<f:selectItems value="#{searchOperators}" var="choice"
+													itemLabel="#{choice.toString}" />
+											</h:selectOneMenu>
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+
+										<p:outputPanel id="panelPatient2" layout="block">
+
+											<h:panelGroup id="addFieldGroup"
+												rendered="#{searchManager.patientFieldValues.containsKey(patientField) and (searchManager.patientFieldValues[patientField] ne null)}">
+
+												<h:inputText
+													value="#{searchManager.patientFieldValues[patientField].newValue}"
+													id="pSearchTerm"
+													rendered="#{not searchManager.patientFieldValues[patientField].hasPermissibleValues}"
+													converter="#{patientField.valueConverter}">
+												</h:inputText>
+
+												<h:selectOneMenu
+													value="#{searchManager.patientFieldValues[patientField].newValue}"
+													id="pSearchTerm2"
+													rendered="#{searchManager.patientFieldValues[patientField].hasPermissibleValues}"
+													converter="#{patientField.valueConverter}">
+													<f:selectItems
+														value="#{searchManager.patientFieldValues[patientField].permissibleValues}"
+														var="item" itemLabel="#{item.toString}"
+														itemValue="#{item}" />
+												</h:selectOneMenu>
+
+
+												<p:commandButton id="pAddIt" icon="ui-icon-plus"
+													value="#{msg['miner.search.step1.add']}"
+													update="panelPatient,panelPatient2,panelPatientOps,panelPatientValues,searchOperatorsPatient,searchValuesPatient"
+													action="#{searchManager.patientFieldValues[patientField].addValue}" />
+
+											</h:panelGroup>
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelPatientOps" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.patientFieldValues.containsKey(patientField) and (searchManager.patientFieldValues[patientField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.operator']}</f:facet>
+												<p:dataGrid id="searchOperatorsPatient" emptyMessage=""
+													columns="10" rows="20"
+													rendered="#{searchManager.patientFieldValues.containsKey(patientField) and (searchManager.patientFieldValues[patientField] ne null)}"
+													var="operator"
+													value="#{searchManager.patientFieldValues[patientField].searchOperators}">
+													<h:outputText value="#{operator.toString}" />
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelPatientValues" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.patientFieldValues.containsKey(patientField)  and (searchManager.patientFieldValues[patientField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.value']}</f:facet>
+												<p:dataGrid id="searchValuesPatient" emptyMessage=""
+													columns="10" rows="20"
+													rendered="#{searchManager.patientFieldValues.containsKey(patientField)  and (searchManager.patientFieldValues[patientField] ne null)}"
+													var="value"
+													value="#{searchManager.patientFieldValues[patientField].values}">
+													<h:panelGroup>
+														<h:outputText value="#{value.toString()}" 
+														/>#{'  '}
+										            	<p:commandButton id="remove" ajax="true"
+															icon="ui-icon-close" value=""
+															rendered="#{searchManager.patientFieldValues.containsKey(patientField) and (searchManager.patientFieldValues[patientField] ne null)}"
+															action="#{searchManager.patientFieldValues[patientField].removeValue(value)}"
+															update="searchValuesPatient" 
+															/>
+														<p:tooltip for="remove"
+															value="Remove this search criteria" showEffect="fade"
+															hideEffect="fade" />
+													</h:panelGroup>
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+
+								</h:panelGrid>
+							</p:column>
+						</p:dataList>
+					</p:panel>
+
+
+
+					<p:panel id="pnlSpecimen"
+						header="#{msg['miner.search.step1.data.specimen']}"
+						toggleable="true" collapsed="false" toggleSpeed="500"
+						closeSpeed="500" widgetVar="panel2">
+
+						<p:dataList id="specDataList"
+							value="#{searchManager.specimenFields}" var="specimenField"
+							type="none">
+							<p:column>
+								<h:panelGrid id="specimenGrid" columns="5" cellspacing="4"
+									cellpadding="4" styleClass="minerBorder"
+									rendered="#{specimenField.visible}">
+									<p:column>
+										<h:panelGroup rendered="#{specimenField.visible}">
+											<p:selectBooleanCheckbox>
+												<p:ajax
+													update="panelSpecimen,panelSpecimen2,panelSpecimenOps,panelSpecimenValues,searchOperators,searchValues"
+													listener="#{searchManager.toggleSpecimenSearchField(specimenField)}" />
+											</p:selectBooleanCheckbox>
+											<h:outputLabel value="#{specimenField.toString}" />
+										</h:panelGroup>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelSpecimen" layout="block">
+											<h:selectOneMenu id="sOperators"
+												value="#{searchManager.specimenFieldValues[specimenField].newOperator}"
+												rendered="#{not searchManager.specimenFieldValues[specimenField].singleOperator and searchManager.specimenFieldValues.containsKey(specimenField)  and (searchManager.specimenFieldValues[specimenField] ne null)}">
+												<f:selectItems value="#{searchOperators}" var="choice"
+													itemLabel="#{choice.toString}" />
+											</h:selectOneMenu>
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelSpecimen2" layout="block">
+
+											<h:panelGroup id="addFieldGroup"
+												rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}">
+
+												<h:inputText
+													value="#{searchManager.specimenFieldValues[specimenField].newValue}"
+													id="sSearchTerm"
+													rendered="#{not searchManager.specimenFieldValues[specimenField].hasPermissibleValues}"
+													converter="#{specimenField.valueConverter}">
+												</h:inputText>
+
+												<h:selectOneMenu
+													value="#{searchManager.specimenFieldValues[specimenField].newValue}"
+													id="sSearchTerm2"
+													rendered="#{searchManager.specimenFieldValues[specimenField].hasPermissibleValues }"
+													converter="#{specimenField.valueConverter}">
+													<f:selectItems
+														value="#{searchManager.specimenFieldValues[specimenField].permissibleValues}"
+														var="item" itemLabel="#{item.toString}"
+														itemValue="#{item}" />
+												</h:selectOneMenu>
+
+												<p:commandButton icon="ui-icon-plus"
+													value="#{msg['miner.search.step1.add']}" id="pAddIt"
+													action="#{searchManager.specimenFieldValues[specimenField].addValue}"
+													update="panelSpecimen,panelSpecimen2,panelSpecimenOps,panelSpecimenValues,searchOperators,searchValues" />
+											</h:panelGroup>
+
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelSpecimenOps" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.operator']}</f:facet>
+												<p:dataGrid id="searchOperators" emptyMessage=""
+													columns="10" rows="20"
+													rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}"
+													var="operator"
+													value="#{searchManager.specimenFieldValues[specimenField].searchOperators}">
+													<h:outputText value="#{operator.toString}" />
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+
+									<p:column>
+										<p:outputPanel id="panelSpecimenValues" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.value']}</f:facet>
+												<p:dataGrid id="searchValues" emptyMessage="" columns="10"
+													rows="20"
+													rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}"
+													value="#{searchManager.specimenFieldValues[specimenField].values}"
+													var="value">
+													<h:panelGroup>
+														<h:outputText value="#{value.toString()}" 
+														/>#{'  '}
+										            
+										            <p:commandButton id="remove" ajax="true"
+															icon="ui-icon-close" value=""
+															rendered="#{searchManager.specimenFieldValues.containsKey(specimenField) and (searchManager.specimenFieldValues[specimenField] ne null)}"
+															action="#{searchManager.specimenFieldValues[specimenField].removeValue(value)}"
+															update="searchValues" 
+															/>
+														<p:tooltip for="remove"
+															value="Remove this search criteria" showEffect="fade"
+															hideEffect="fade" />
+													</h:panelGroup>
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+								</h:panelGrid>
+							</p:column>
+						</p:dataList>
+					</p:panel>
+
+
+					<p:panel id="pnlNormal"
+						rendered="#{not authorizations.isPublicUser}"
+						header="#{msg['miner.search.step1.data.normal']} #{msg['miner.search.step1.data.asterisk']}"
+						footer="#{msg['miner.search.step1.data.normal.footer']} "
+						toggleable="true" collapsed="false" toggleSpeed="500"
+						closeSpeed="500" widgetVar="panel3">
+
+
+						<p:dataList id="normalDataList"
+							value="#{searchManager.normalFields}" var="normalField"
+							type="none">
+							<p:column>
+								<h:panelGrid id="normalGrid" columns="5" cellspacing="4"
+									cellpadding="4" styleClass="minerBorder"
+									rendered="#{normalField.visible}">
+									<p:column>
+										<h:panelGroup rendered="#{normalField.visible}">
+											<p:selectBooleanCheckbox>
+												<p:ajax
+													update="normalPanel,normalPanel2,panelNormalOps,panelNormalValues,searchOperatorsNormal,searchValuesNormal"
+													listener="#{searchManager.toggleNormalSearchField(normalField)}" />
+											</p:selectBooleanCheckbox>
+											<h:outputLabel value="#{normalField.toString}" />
+										</h:panelGroup>
+									</p:column>
+									<p:column>
+										<p:outputPanel id="normalPanel" layout="block">
+
+											<h:selectOneMenu
+												value="#{searchManager.normalFieldValues[normalField].newOperator}"
+												rendered="#{not searchManager.normalFieldValues[normalField].singleOperator and searchManager.normalFieldValues.containsKey(normalField)  and (searchManager.normalFieldValues[normalField] ne null)}">
+												<f:selectItems value="#{searchOperators}" var="choice"
+													itemLabel="#{choice.toString}" />
+											</h:selectOneMenu>
+
+										</p:outputPanel>
+									</p:column>
+									<p:column>
+										<p:outputPanel id="normalPanel2" layout="block">
+
+											<h:panelGroup id="addFieldGroup"
+												rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}">
+												<h:inputText
+													value="#{searchManager.normalFieldValues[normalField].newValue}"
+													id="nSearchTerm"
+													rendered="#{not searchManager.normalFieldValues[normalField].hasPermissibleValues }"
+													converter="#{normalField.valueConverter}">
+												</h:inputText>
+
+												<h:selectOneMenu
+													value="#{searchManager.normalFieldValues[normalField].newValue}"
+													id="nSearchTerm2"
+													rendered="#{searchManager.normalFieldValues[normalField].hasPermissibleValues}"
+													converter="#{normalField.valueConverter}">
+													<f:selectItems
+														value="#{searchManager.normalFieldValues[normalField].permissibleValues}"
+														var="item" itemLabel="#{item.toString}" 
+														itemValue="#{item}"/>
+												</h:selectOneMenu>
+
+												<p:commandButton id="pAddIt" icon="ui-icon-plus"
+													value="#{msg['miner.search.step1.add']}"
+													action="#{searchManager.normalFieldValues[normalField].addValue}"
+													update="normalPanel,normalPanel2,panelNormalOps,panelNormalValues,searchValuesNormal" />
+
+
+											</h:panelGroup>
+
+										</p:outputPanel>
+									</p:column>
+									<p:column>
+										<p:outputPanel id="panelNormalOps" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.operator']}</f:facet>
+												<p:dataGrid id="searchOperatorsNormal" emptyMessage=""
+													columns="10" rows="20"
+													rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}"
+													var="operator"
+													value="#{searchManager.normalFieldValues[normalField].searchOperators}">
+													<h:outputText value="#{operator.toString}" />
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+									<p:column>
+										<p:outputPanel id="panelNormalValues" layout="block">
+											<h:panelGrid columns="1" styleClass="minerBorder,topAlign"
+												rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}">
+												<f:facet name="header">#{msg['miner.search.step1.value']}</f:facet>
+												<p:dataGrid id="searchValuesNormal" emptyMessage=""
+													columns="10" rows="20"
+													rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}"
+													var="value"
+													value="#{searchManager.normalFieldValues[normalField].values}">
+													<h:panelGroup>
+														<h:outputText value="#{value.toString()}" 
+														/>#{'  '}
+												            <p:commandButton id="remove" ajax="true"
+															icon="ui-icon-close" value=""
+															rendered="#{searchManager.normalFieldValues.containsKey(normalField) and (searchManager.normalFieldValues[normalField] ne null)}"
+															action="#{searchManager.normalFieldValues[normalField].removeValue(value)}"
+															update="searchValuesNormal" />
+														<p:tooltip for="remove"
+															value="Remove this search criteria" showEffect="fade"
+															hideEffect="fade" />
+													</h:panelGroup>
+												</p:dataGrid>
+											</h:panelGrid>
+										</p:outputPanel>
+									</p:column>
+								</h:panelGrid>
+							</p:column>
+						</p:dataList>
+
+					</p:panel>
+					
+					<f:facet name="footer">
+
+					<h:panelGrid id="patientGrid" columns="2" cellspacing="4"
+						cellpadding="4" styleClass="minerBorder">
+
+						<p:commandButton value="#{msg['miner.search.step1.reset']}"
+							process="@form" action="#{searchManager.reset}" ajax="false"
+							 icon="ui-icon-arrowrefresh-1-w"
+							 update="@form">
+						</p:commandButton>
+
+
+						<p:commandButton value="#{msg['miner.search.step1.next']}"
+							action="#{searchManager.runCount}" ajax="true"
+							process="@form" icon="ui-icon-triangle-1-e" 
+							update="messages"/>
+
+					</h:panelGrid>
+				</f:facet>
+					
+
+				</p:panel>
+			</div>
+		</h:form>
+		<p:ajaxStatus onstart="minerBlock.show();"
+			onsuccess="minerBlock.hide();" />
+		<p:blockUI block=":mainForm:pnl" widgetVar="minerBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,76 @@
+<html>
+<body>
+<p>
+Dear RAC Member,
+</p>
+<p>
+A new application has been submitted to Acquire for resource distribution. As a 
+member of the Resource Allocation Committee, you are receiving this email as a 
+request that you review and vote on the application.
+</p>
+
+<p>
+A summary of the application can be found in this email below. You may also log 
+in to Acquire (<a href="${server}">
+${server}</a>), click on the RAC tab and 
+view additional application details.  Once in Acquire, you can make comments to 
+the other RAC reviewers or request additional information from the 
+application submitter.  
+</p>
+
+<p>
+Click <a href="${link}">Here</a> to review the full application.
+</p>
+
+<p>
+If the details included in this email provide enough information, or if you 
+have already reviewed this request and are ready to vote on the application, 
+you may:
+</p>
+
+Click <a href="${voteYesLink}">Here</a> to Vote YES    OR <br />
+Click <a href="${voteNoLink}">Here</a> to Vote NO <br />
+
+<br />
+<br />
+Principal Investigator: ${application.investigator.firstName} ${application.investigator.lastName} <br />
+Title: ${application.investigator.title!"None"}  <br />
+Institution: ${application.investigator.institutionName!"None"}  <br />
+Department: ${application.investigator.department!"None"} <br />
+Does the investigator have any significant financial conflict of interest?: ${application.investigator.fcoi?string("Yes", "No")!"Unknown"} <br />
+Project Title: ${application.project.projectTitle!"None"}  <br />
+IRB Status: ${application.project.irbStatus!"None"} <br />
+Summary of Proposed Research: ${application.project.researchSummary!"None"}  <br />
+Specimen Criteria: <br />
+Race: <br />
+<#list application.materialRequests.race as race>
+${race} <br />
+</#list> 
+ <br />
+Ethnicity: <br />
+<#list application.materialRequests.ethnicity as ethnic>
+${ethnic} <br />
+</#list>
+ <br />
+Age at Time of Collection: <br />
+<#list application.materialRequests.ageAtCollection as range>
+${range.operator} ${range.ageRange} <br />
+</#list>
+
+Gender: <br />
+<#list application.materialRequests.gender as gender>
+${gender} <br />
+</#list>
+
+Organ Site: <br /> 
+<#list application.materialRequests.organSite as site>
+${site} <br />
+</#list>
+ <br />
+Diagnosis Type: ${application.materialRequests.diagnosis!"None"} <br />
+Prior Chemo or Radiation Treatment: ${application.materialRequests.priorTreatment!"None"}
+ <br />
+Total Number of Cases Requested: ${application.materialRequests.numberCases!"0"}
+</body>
+</html>
+

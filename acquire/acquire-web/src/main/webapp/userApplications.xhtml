@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+		<h1>Saved and Submitted Applications</h1>
+			<p:dataTable styleClass="report" paginator="true" rows="15"
+				value="#{userApplications}" var="row" id="applicationTable"
+				currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+				paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				paginatorPosition="bottom" style="width:700px;">
+				<p:column sortBy="#{row.project.projectTitle}"
+					filterBy="#{row.project.projectTitle}" filterMatchMode="contains"
+					width="500">
+					<f:facet name="header">Title</f:facet>
+					<h:link outcome="/apply.jsf" value="#{row.project.projectTitle}"
+						includeViewParams="true">
+						<f:param name="id" value="#{row.id}" />
+					</h:link>
+				</p:column>
+				<p:column sortBy="#{row.applicationStatus.toString}"
+					filterBy="#{row.applicationStatus.toString}"
+					filterMatchMode="contains" width="150" style = "text-align:center;">
+					<f:facet name="header">Status</f:facet>
+					<h:outputText value="#{row.applicationStatus.toString}" />
+				</p:column>
+
+
+
+			</p:dataTable>
+	</ui:define>
+</ui:composition>

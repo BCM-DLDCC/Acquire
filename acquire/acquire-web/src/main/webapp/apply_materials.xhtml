@@ -1,0 +1,431 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:a="http://richfaces.org/a4j">
+
+	<!--  data section -->
+	<p:panel>
+		<f:facet name="header">
+Data Request
+</f:facet>
+		<p>An approved specimen request will include the following
+			standard data set: race, ethnicity, gender, clinical diagnosis,
+			disease site, age at time of collection, tumor type, tumor stage,
+			tumor grade, prior treatment status, percent tumor nuclei and percent
+			tumor necrosis. Please note that all data elements may not be
+			available on every specimen.</p>
+
+		<p:selectBooleanCheckbox value="#{request.excludeStandardData}"
+			id="datasetCheck" disabled="#{not edit}" />
+		<p:spacer width="10" />
+		<p:outputLabel for="datasetCheck"
+			value="Check here if you do NOT wish to receive the standard data set" />
+		<br />
+		<br />
+		<p:outputLabel for="additionalRequest"
+			value="Describe any additional data request" />
+		<br />
+		<p:inputTextarea id="additionalRequest" styleClass="fourCol"
+			value="#{request.additionalDataRequest}" disabled="#{not edit}" />
+
+
+	</p:panel>
+
+	<!--  specimen section -->
+	<p:panel>
+		<f:facet name="header">
+			Specimen Request
+		</f:facet>
+		<p>Multiple selections can be made in the following fields by
+			holding the Ctrl key (Windows) or by holding the Command key (Mac). A
+			selection does not have to be made for each specimen criteria field
+			if there is no requirement for that particular criteria.</p>
+		<p:panelGrid styleClass="formTable">
+			<p:row>
+				<p:column colspan="2">
+					<p:outputLabel value="Race" for="raceMenu" />
+					<br />
+					<p:selectManyMenu value="#{request.race}" id="raceMenu"
+						style="height:150px; width:${css.twoCol}" disabled="#{not edit}"
+						collectionType="java.util.ArrayList">
+						<f:selectItems value="#{raceList}" var="race" itemLabel="#{race}"
+							itemValue="#{race}" />
+					</p:selectManyMenu>
+
+				</p:column>
+				<p:column colspan="2">
+					<p:outputLabel value="Ethnicity" for="ethnicityMenu" />
+					<br />
+					<p:selectManyMenu value="#{request.ethnicity}" id="ethnicityMenu"
+						style="height:150px; width:${css.twoCol}" disabled="#{not edit}"
+						collectionType="java.util.ArrayList">
+						<f:selectItems value="#{ethnicityList}" var="ethnic"
+							itemLabel="#{ethnic}" itemValue="#{ethnic}" />
+					</p:selectManyMenu>
+
+				</p:column>
+			</p:row>
+			<p:row>
+
+				<p:column colspan="2">
+					<p:outputLabel value="Gender" />
+					<br />
+					<p:selectManyMenu value="#{request.gender}" id="genderMenu"
+						style="height:150px; width:${css.twoCol}" disabled="#{not edit}"
+						collectionType="java.util.ArrayList">
+						<f:selectItems value="#{genderList}" var="gender"
+							itemLabel="#{gender}" itemValue="#{gender}" />
+					</p:selectManyMenu>
+				</p:column>
+
+				<p:column colspan="2">
+					<p:outputLabel value="Age at time of collection" />
+					<br />
+					<p:dataTable value="#{request.agesAsList}" var="age"
+						id="ageRangeTable">
+						<f:facet name="header">
+					Age Ranges
+					</f:facet>
+						<p:column headerText="Operator">
+							<h:outputText value="#{age.operator.toString()}" />
+						</p:column>
+
+						<p:column headerText="Age Range">
+							<h:outputText value="#{age.ageRange.toString()}" />
+						</p:column>
+
+						<p:column>
+							<p:commandButton icon="ui-icon-close" value="Remove"
+								update="ageRangeTable"
+								action="#{applicationManager.removeAgeRange(age)}"
+								disabled="#{not edit}" />
+						</p:column>
+
+					</p:dataTable>
+
+					<p:selectOneMenu value="#{applicationManager.operator}"
+						style="margin: 5px 5px 0px 0px;" disabled="#{not edit}">
+						<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+						<f:selectItems value="#{searchOperators}" var="choice"
+							itemLabel="#{choice}" itemValue="#{choice}" />
+					</p:selectOneMenu>
+
+					<p:selectOneMenu value="#{applicationManager.range}" var="range"
+						style="margin: 5px 5px 0px 0px;" disabled="#{not edit}">
+						<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+						<f:selectItems value="#{ageRanges}" var="current"
+							itemLabel="#{current.toString}" itemValue="#{current.name()}" />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Add"
+						action="#{applicationManager.addAgeRange}" update="ageRangeTable"
+						disabled="#{not edit}" style="height: 28px; top: -6px;" 
+						onstart="applyBlock.show();" oncomplete="applyBlock.hide();"/>
+
+
+
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column colspan="4">
+					<p:outputLabel value="Organ Site&#x2020;" for="siteMenu" />
+					<br />
+					<p:selectManyMenu value="#{request.organSite}"
+						style="height:200px; width:${css.threeCol}" id="siteMenu"
+						disabled="#{not edit}" collectionType="java.util.ArrayList"
+						required="#{applicationManager.submitting}">
+						<f:selectItems value="#{diseaseSiteList}" var="site"
+							itemLabel="#{site}" itemValue="#{site}" />
+					</p:selectManyMenu>
+					<p:message for=":mainForm:applyAccordian:siteMenu" />
+				</p:column>
+			</p:row>
+			<p:row>
+				<p:column>
+					<p:outputLabel value="Diagnosis Type&#x2020;" for="diagnosisInput"
+						id="diagText">
+						<image class="ui-icon ui-icon-info" style="display: inline-block;" />
+					</p:outputLabel>
+					<p:tooltip for="diagText">
+					Please describe the specimen diagnosis in which you are interested</p:tooltip>
+					<br />
+					<p:inputText value="#{request.diagnosis}" id="diagnosisInput"
+						disabled="#{not edit}" required="#{applicationManager.submitting}"
+						styleClass="twoCol" />
+					<p:message for=":mainForm:applyAccordian:diagnosisInput" />
+				</p:column>
+				<p:column colspan="3">
+					<p:outputLabel value="Prior Chemo or Radiation Treatment&#x2020;"
+						for="treatmentMenu" />
+					<br />
+					<p:selectOneMenu value="#{request.priorTreatment}"
+						id="treatmentMenu" style="width:${css.oneCol}"
+						disabled="#{not edit}" required="#{applicationManager.submitting}">
+						<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+						<f:selectItems value="#{yesNoList}" var="treatment"
+							itemLabel="#{treatment.toString()}" itemValue="#{treatment}" />
+					</p:selectOneMenu>
+					<p:message for=":mainForm:applyAccordian:treatmentMenu" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+	</p:panel>
+
+	<p:panel>
+		<f:facet name="header">Tumor Specimen Requests</f:facet>
+		<p:panelGrid styleClass = "formTable">
+			<p:row>
+				<p:column>
+					<p:outputLabel value="Total number of cases requested&#x2020;"
+						for="numberInput" />
+					<br />
+					<p:spinner value="#{request.numberCases}" min="0" id="numberInput"
+						size="2" readonly="#{not edit}" disabled="#{not edit}"
+						required="#{applicationManager.submitting}" />
+					<p:message for=":mainForm:applyAccordian:numberInput" />
+				</p:column>
+				<p:column colspan="3">
+					<p:outputLabel value="Specimen Pathological Status&#x2020;"
+						for="pathMenu" />
+
+					<p:selectManyMenu value="#{request.pathologicalStatus}"
+						style="height:80px; width:${css.twoCol}" id="pathMenu"
+						collectionType="java.util.ArrayList" disabled="#{not edit}"
+						required="#{applicationManager.submitting}">
+						<f:selectItems value="#{pathStatusList}" var="path"
+							itemLabel="#{path}" itemValue="#{path}" />
+					</p:selectManyMenu>
+
+					<p:message for=":mainForm:applyAccordian:pathMenu" />
+				</p:column>
+			</p:row>
+		</p:panelGrid>
+	</p:panel>
+	<p:panel>
+		<f:facet name="header">
+                Tissue Type: Check the type(s) requested and fill in the quantity of each CASE needed:
+              </f:facet>
+		<p:dataTable value="#{tumorTypeChoices}" var="type"
+			id="tumorTypeTable">
+			<p:columnGroup type="header">
+				<p:row>
+					<p:column headerText="Tissue Type" />
+					<p:column headerText="Total # Needed" />
+					<p:column headerText="Amount of Each Sample" />
+					<p:column headerText="Separated in # of Containers" />
+				</p:row>
+			</p:columnGroup>
+			<p:column>
+				<p:commandButton id="tumorTypeCheck"
+					icon="#{request.tissueTypes.containsKey(type) ? 'ui-icon-check' : 'ui-icon-plus'}"
+					update="tumorTypeTable" process="tumorTypeTable"
+					action="#{request.toggleTissueType(type)}" disabled="#{not edit}"
+					onstart="applyBlock.show();" oncomplete="applyBlock.hide();" />
+
+				<h:outputText value="#{type.toString()}" />
+			</p:column>
+
+			<p:column rendered="#{request.tissueTypes.containsKey(type)}">
+				<p:spinner value="#{request.tissueTypes[type].totalNumber}" min="0"
+					size="2" disabled="#{not edit}" />
+			</p:column>
+
+			<p:column rendered="#{request.tissueTypes.containsKey(type)}">
+				<p:inputText value="#{request.tissueTypes[type].amount}" size="5"
+					disabled="#{not edit}" />
+				<h:outputText value=" #{type.unitOfMeasure} " />
+				<h:panelGroup rendered="#{type.secondaryMeasure}">
+					<p:inputText value="#{request.tissueTypes[type].secondaryAmount}"
+						size="5" disabled="#{not edit}" />
+					<h:outputText value=" #{type.secondaryUnitOfMeasure} " />
+				</h:panelGroup>
+				<h:panelGroup rendered="#{type.tertiaryMeasure}">
+					<p:inputText value="#{request.tissueTypes[type].tertiaryAmount}"
+						size="5" disabled="#{not edit}" />
+					<h:outputText value=" #{type.tertiaryUnitOfMeasure}" />
+				</h:panelGroup>
+			</p:column>
+
+			<p:column rendered="#{request.tissueTypes.containsKey(type)}">
+				<h:panelGroup rendered="#{type.containers}">
+					<h:outputText value="in " />
+					<p:spinner value="#{request.tissueTypes[type].numberContainers}"
+						min="0" size="2" disabled="#{not edit}" />
+					<h:outputText value=" #{type.containerLabel}" />
+				</h:panelGroup>
+			</p:column>
+		</p:dataTable>
+
+	</p:panel>
+	<p:panelGrid style="width:1200px">
+		<f:facet name="header">
+			<p:row>
+				<p:column colspan="2">
+            Normal Specimen Requests
+            </p:column>
+			</p:row>
+		</f:facet>
+		<p:row>
+			<p:column colspan="2">
+				<p:panel style="border: none">
+            Please check the desired tissue type for the normal specimens. If
+            you are not requesting normal specimens, please skip this section.
+            Note that normal adjacent refers to tissue from the same organ as
+            the tumor, while matched normal refers to tissue from the same 
+            participant at a different organ site.
+            </p:panel>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="bloodRequest" value="Blood" />
+			</p:column>
+			<p:column>
+				<p:selectOneMenu value="#{request.bloodNormal}"
+					disabled="#{not edit}" id="bloodRequest">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{specimenRequestTypeChoices}" var="type"
+						itemLabel="#{type.toString}" itemValue="#{type}" />
+				</p:selectOneMenu>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="skinRequest" value="Skin" />
+			</p:column>
+			<p:column>
+				<p:selectOneMenu value="#{request.skinNormal}"
+					disabled="#{not edit}" id="skinRequest">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{specimenRequestTypeChoices}" var="type"
+						itemLabel="#{type.toString}" itemValue="#{type}" />
+				</p:selectOneMenu>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="matchedRequest" value="Matched Normal Tissue" />
+			</p:column>
+			<p:column>
+				<p:selectOneMenu value="#{request.matchedNormal}"
+					disabled="#{not edit}" id="matchedRequest">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{specimenRequestTypeChoices}" var="type"
+						itemLabel="#{type.toString}" itemValue="#{type}" />
+				</p:selectOneMenu>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="adjacentRequest" value="Adjacent Normal Tissue" />
+			</p:column>
+			<p:column>
+				<p:selectOneMenu value="#{request.adjacentNormal}"
+					disabled="#{not edit}" id="adjacentRequest">
+					<f:selectItem itemLabel="#{msg['select.one']}" itemValue="" />
+					<f:selectItems value="#{specimenRequestTypeChoices}" var="type"
+						itemLabel="#{type.toString}" itemValue="#{type}" />
+				</p:selectOneMenu>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="anyNormal" value="Any Available" />
+			</p:column>
+			<p:column>
+				<p:selectBooleanCheckbox id="anyNormal" value="#{request.anyNormal}"
+					disabled="#{not edit}" />
+			</p:column>
+
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="otherRequest" value="Other" />
+			</p:column>
+			<p:column>
+				<p:inputText id="otherRequest" value="#{request.otherNormal}"
+					disabled="#{not edit}" />
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column>
+				<p:outputLabel for="normalNumberInput"
+					value="Total number of normals being requested&#x2020;" />
+			</p:column>
+			<p:column>
+				<p:spinner value="#{request.numberNormals}" min="0" size="2"
+					id="normalNumberInput" disabled="#{not edit}"
+					required="#{applicationManager.submitting}" />
+				<p:message for=":mainForm:applyAccordian:normalNumberInput" />
+			</p:column>
+		</p:row>
+
+	</p:panelGrid>
+
+	<p:panel>
+		<f:facet name="header">
+                Please select the tissue types below of the normal specimen 
+                requested above
+              </f:facet>
+		<p:dataTable value="#{normalTypeChoices}" var="type"
+			id="normalTypeTable">
+			<p:columnGroup type="header">
+				<p:row>
+					<p:column headerText="Normal Tissue Type" />
+					<p:column headerText="Total # Needed" />
+					<p:column headerText="Amount of Each Sample" />
+					<p:column headerText="Separated in # of Containers" />
+				</p:row>
+			</p:columnGroup>
+			<p:column>
+				<p:commandButton id="normalTypeCheck"
+					icon="#{request.normalTypes.containsKey(type) ? 'ui-icon-check' : 'ui-icon-plus'}"
+					update="normalTypeTable" action="#{request.toggleNormalType(type)}"
+					disabled="#{not edit}" process="normalTypeTable" 
+					onstart="applyBlock.show();" oncomplete="applyBlock.hide();"/>
+
+				<h:outputText value="#{type.toString()}" />
+			</p:column>
+
+			<p:column rendered="#{request.normalTypes.containsKey(type)}">
+				<p:spinner value="#{request.normalTypes[type].totalNumber}" min="0"
+					size="2" disabled="#{not edit}" />
+			</p:column>
+
+			<p:column rendered="#{request.normalTypes.containsKey(type)}">
+				<p:inputText value="#{request.normalTypes[type].amount}" size="5"
+					disabled="#{not edit}" />
+				<h:outputText value=" #{type.unitOfMeasure} " />
+				<h:panelGroup rendered="#{type.secondaryMeasure}">
+					<p:inputText value="#{request.normalTypes[type].secondaryAmount}"
+						size="5" disabled="#{not edit}" />
+					<h:outputText value=" #{type.secondaryUnitOfMeasure} " />
+				</h:panelGroup>
+				<h:panelGroup rendered="#{type.tertiaryMeasure}">
+					<p:inputText value="#{request.normalTypes[type].tertiaryAmount}"
+						size="5" disabled="#{not edit}" />
+					<h:outputText value=" #{type.tertiaryUnitOfMeasure}" />
+				</h:panelGroup>
+			</p:column>
+
+			<p:column rendered="#{request.normalTypes.containsKey(type)}">
+				<h:panelGroup rendered="#{type.containers}">
+					<h:outputText value="in " />
+					<p:spinner value="#{request.normalTypes[type].numberContainers}"
+						min="0" size="2" disabled="#{not edit}" />
+					<h:outputText value=" #{type.containerLabel}" />
+				</h:panelGroup>
+			</p:column>
+		</p:dataTable>
+
+	</p:panel>
+
+</ui:composition>

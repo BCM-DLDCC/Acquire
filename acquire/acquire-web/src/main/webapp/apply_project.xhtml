@@ -1,0 +1,152 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sf="http://java.sun.com/jsf/composite/components/seamfaces">
+
+	<p:panelGrid styleClass= "formTable">
+		<p:row>
+			<p:column colspan="4">
+				<p:outputLabel value="Project Title" for="projectTitleInput" />
+				<br />
+				<p:inputText id="projectTitleInput" value="#{project.projectTitle}"
+					styleClass="threeCol" required="true" disabled="#{not edit}"
+					label="Project Title" />
+				<p:message for=":mainForm:applyAccordian:projectTitleInput" />
+			</p:column>
+		</p:row>
+
+
+		<p:row>
+			<p:column colspan="2">
+
+				<p:outputLabel value="Funding Source/Grant Number:&#x2020;"
+					for="fundingInput" />
+				<br />
+				<p:inputText id="fundingInput" value="#{project.fundingSource.name}"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					styleClass="twoCol" />
+				<p:message for=":mainForm:applyAccordian:fundingInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Grant Start date:&#x2020;" for="startInput" />
+				<br />
+				<p:calendar value="#{project.fundingSource.startDate}"
+					id="startInput" disabled="#{not edit}"
+					required="#{applicationManager.submitting}" styleClass="oneCol" 
+					navigator="true"/>
+				<p:message for=":mainForm:applyAccordian:startInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Grant End date:&#x2020;" for="endInput" />
+				<br />
+				<p:calendar value="#{project.fundingSource.endDate}" id="endInput"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					styleClass="oneCol"
+					navigator="true" />
+				<p:message for=":mainForm:applyAccordian:endInput" />
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column colspan="2">
+				<p:outputLabel value="Additional Funding Source/Grant Number:"
+					for="funding2Input" />
+				<br />
+				<p:inputText id="funding2Input"
+					value="#{project.additionalFunding.name}" disabled="#{not edit}"
+					styleClass="twoCol" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Grant Start date:" for="start2Input" />
+				<br />
+				<p:calendar value="#{project.additionalFunding.startDate}"
+					id="start2Input" disabled="#{not edit}" styleClass="oneCol"
+					navigator="true" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="Grant End date:" for="end2Input" />
+				<br />
+				<p:calendar value="#{project.additionalFunding.endDate}"
+					id="end2Input" disabled="#{not edit}" styleClass="oneCol" 
+					navigator="true"/>
+			</p:column>
+		</p:row>
+
+		<p:row>
+			<p:column colspan="2">
+				<p:outputLabel value="IRB review status:&#x2020;" for="irbInput" />
+				<br />
+				<p:panel>
+				<p:selectOneRadio id="irbInput" value="#{project.irbStatus}"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					layout="pageDirection">
+					<f:selectItems value="#{irbStatusChoices}" var="irbStatus"
+						itemLabel="#{irbStatus.toString}" itemValue="#{irbStatus}" />
+						<p:ajax event="change" process="@this" 
+						update="irbNoInput, irbApproveInput, irbExpireInput" />
+				</p:selectOneRadio>
+				<p:message for=":mainForm:applyAccordian:irbInput" />
+				</p:panel>
+			</p:column>
+
+			<p:column colspan="2">
+				<p:outputLabel value="Name of IRB:&#x2020;" for="irbNameInput" />
+				<br />
+				<p:inputText value="#{project.irbName}" id="irbNameInput"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					styleClass="oneCol" />
+				<p:message for=":mainForm:applyAccordian:irbNameInput" />
+			</p:column>
+		</p:row>
+		<p:row>
+			<p:column>
+				<p:outputLabel value="IRB protocol Number:&#x2020;" for="irbNoInput" />
+				<br />
+				<p:inputText id="irbNoInput" value="#{project.irbProtocolNumber}"
+					disabled="#{not edit or project.irbStatus ne 'APPROVED'}" 
+					required="#{applicationManager.submitting}"
+					styleClass="oneCol" 
+					/>
+				<p:message for=":mainForm:applyAccordian:irbNoInput" />
+			</p:column>
+			<p:column>
+				<p:outputLabel value="IRB Protocol Approval Date:&#x2020;"
+					for="irbApproveInput" />
+				<br />
+				<p:calendar value="#{project.irbApprovalDate}" id="irbApproveInput"
+					disabled="#{not edit or project.irbStatus ne 'APPROVED'}" 
+					required="#{applicationManager.submitting}"
+					styleClass="oneCol" 
+					navigator="true"/>
+				<p:message for=":mainForm:applyAccordian:irbApproveInput" />
+			</p:column>
+			<p:column colspan="2">
+				<p:outputLabel value="IRB Protocol Expiration Date:&#x2020;"
+					for="irbExpireInput" />
+				<br />
+				<p:calendar value="#{project.irbExpiration}" id="irbExpireInput"
+					disabled="#{not edit or project.irbStatus ne 'APPROVED'}" 
+					required="#{applicationManager.submitting}"
+					styleClass="oneCol"
+					navigator="true" />
+				<p:message for=":mainForm:applyAccordian:irbExpireInput" />
+			</p:column>
+		</p:row>
+		<p:row>
+			<p:column colspan="4">
+				<h:outputText value="#{msg['rac.apply.project.summary']}&#x2020;" escape="false"/>
+				<br />
+				<p:message for=":mainForm:applyAccordian:projectSummary" />
+				<p:editor
+					controls="bold italic underline strikethrough font size style color undo  center justify bullets numbering indent outdent"
+					width="890" id="projectSummary" value="#{project.researchSummary}"
+					disabled="#{not edit}" required="#{applicationManager.submitting}"
+					requiredMessage="Project Summary is a required field" />
+				<p:watermark for="projectSummary"
+					value="Maximum of 1 normal page  allowed." />
+			</p:column>
+		</p:row>
+	</p:panelGrid>
+</ui:composition>

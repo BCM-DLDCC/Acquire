@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:sf="http://java.sun.com/jsf/composite/components/seamfaces">
+
+	
+		<p>
+        View the  policies and procedures at <h:outputLink
+				value="http://www.txcrb.org/forms/TCRB%20RAC%20Policies%20and%20Procedures.pdf"
+				target="_new">
+        www.txcrb.org </h:outputLink>
+		</p>
+		<p>
+			
+			<p:selectBooleanCheckbox id="certificationAgree"
+				value="#{application.certification.response}" 
+				disabled="#{not edit}" 
+				validator="#{applicationManager.validateCertification}"/><p:spacer width="10px;"/>
+			<p:outputLabel 
+			value="I agree to the policies and procedures of the Resource Allocation Committee&#x2020;"
+			for="certificationAgree"/>
+			<p:message for=":mainForm:applyAccordian:certificationAgree" />
+		</p>
+		<p:commandButton value="Sign Certification"
+			action="#{applicationManager.signApplication}"
+			update=":mainForm:messages" disabled="#{not edit}"
+			process="@this" />
+
+	
+</ui:composition>

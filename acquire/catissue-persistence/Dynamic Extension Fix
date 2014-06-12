@@ -1,0 +1,5 @@
+delete from catissue_specimen_rec_ntry where identifier not in (
+  select dyextn_as_1943_1960 from de_e_1900);
+  
+  delete from dyextn_abstract_record_entry where identifier not in (
+  select dyextn_as_1943_1960 from de_e_1900);

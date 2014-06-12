@@ -1,0 +1,106 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>acquire</artifactId>
+    <groupId>edu.bcm.dldcc.big</groupId>
+    <version>2.3.4.Final</version>
+    <relativePath>..</relativePath>
+  </parent>
+  <artifactId>query-ejb</artifactId>
+  <name>Acquire Query</name>
+  <description>Querying functionality for Acquire</description>
+   
+  
+    <dependencies>
+    	<dependency>
+    		<groupId>org.jboss.spec</groupId>
+    		<artifactId>jboss-javaee-6.0</artifactId>
+    		<type>pom</type>
+    		<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.jboss.seam.security</groupId>
+    		<artifactId>seam-security</artifactId>
+    		<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>javax.enterprise</groupId>
+    		<artifactId>cdi-api</artifactId>
+    		<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>edu.bcm.dldcc.big</groupId>
+    		<artifactId>acquire-api</artifactId>
+    		<type>ejb</type>
+    		<scope>provided</scope>
+    		<classifier>${deployment}</classifier>
+    	</dependency>
+    	<dependency>
+    		<groupId>edu.bcm.dldcc.big</groupId>
+    		<artifactId>acquire-utility</artifactId>
+    		<scope>provided</scope>
+    		<classifier>${deployment}</classifier>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.hibernate.javax.persistence</groupId>
+    		<artifactId>hibernate-jpa-2.0-api</artifactId>
+    		<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>edu.bcm.dldcc.big</groupId>
+    		<artifactId>catissue-persistence</artifactId>
+    		<scope>provided</scope>
+    		<classifier>${deployment}</classifier>
+    	</dependency>
+    	<dependency>
+    		<groupId>edu.bcm.dldcc.big</groupId>
+    		<artifactId>annotations-persistence</artifactId>
+    		<type>ejb</type>
+    		<scope>provided</scope>
+    		<classifier>${deployment}</classifier>
+    	</dependency>
+    	<dependency>
+    		<groupId>edu.bcm.dldcc.big</groupId>
+    		<artifactId>dldcc-common</artifactId>
+    		<scope>provided</scope>
+    	</dependency>
+    	<dependency>
+    		<groupId>org.hibernate</groupId>
+    		<artifactId>hibernate-envers</artifactId>
+    		<scope>provided</scope>
+    	</dependency>
+    </dependencies>
+    
+     <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <!-- Tell Maven we are using EJB 3.1 -->
+          <ejbVersion>3.1</ejbVersion>
+          <classifier>${deployment}</classifier>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <scm>
+    <url>svn://svn.dldcc.bcm.edu/svn/repo/acquire_2</url>
+    <developerConnection>scm:svn:svn://svn.dldcc.bcm.edu:3690/acquire_2.x</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+  <packaging>ejb</packaging>
+</project>

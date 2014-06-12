@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0" xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd">
+  <sequence-generator name="newParticipantGenerator"
+    sequence-name="NEW_PARTICIPANT_SEQ"/>
+    
+    <sequence-generator name="newSiteGenerator"
+    sequence-name="NEW_SITE_SEQ"/>
+    
+    <sequence-generator name="newUserGenerator"
+    sequence-name="NEW_USER_SEQ"/>
+    
+    <sequence-generator name="newSpecimenGenerator"
+    sequence-name="NEW_SPECIMEN_SEQ" />
+  
+  <sql-result-set-mapping name="dynamicExtensionName">
+    <column-result name="NAME"/>
+  </sql-result-set-mapping>
+  
+</entity-mappings>
+
+
+    

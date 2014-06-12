@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+
+	<h1>Overview and Quality Control Reports</h1>
+
+	<p:panel id="qcReportSelectSection">
+		<h:form id="qcReportSelectionForm">
+			<p:selectOneMenu value="#{reportManager.reportType}"
+				id="qcReportSelector" widgetVar="qcReportSelector"
+				style="width: 350px;" onchange="toggleReportSites();">
+				<f:selectItem itemLabel="Select a report..." itemValue="#{null}" />
+				<f:selectItems value="#{reportManager.reportTypes}" />
+			</p:selectOneMenu>
+
+			<p:commandButton value="Go" styleClass="qcReportSearchButton"
+				id="qcReportSearchButton"
+				update=":mainContent:qcReportReportSection"
+				action="#{reportManager.runQCReport}"
+				oncomplete="disableEnterSubmit();" />
+
+			<div id="qcReportsDiv" style="float: right; display: none;">
+				<p:selectOneMenu value="#{reportManager.collectionSite}"
+					id="qcReportSites" widgetVar="qcReportSites" style="width: 250px;">
+					<f:selectItem itemLabel="All Sites" itemValue="" />
+					<f:selectItems value="#{currentSites}" />
+				</p:selectOneMenu>
+			</div>
+
+			<p:blockUI block=":mainContent" trigger="qcReportSearchButton">
+				<h:graphicImage library="img" name="ajax-loader.gif" />
+			</p:blockUI>
+
+
+		</h:form>
+
+	</p:panel>
+
+
+	<p:panel id="qcReportReportSection">
+
+		<h:form id="qcReportsForm">
+			<p:scrollPanel mode="native">
+				<p:dataTable rendered="#{reportManager.reportType == 'QC_REPORT'}"
+					styleClass="report" paginator="true" rows="15"
+					value="#{reportManager.qcReport}" var="row" id="qcReportTable1"
+					currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					paginatorPosition="bottom"
+					filteredValue="#{reportManager.filteredNotifications}">
+					<p:column width="110" sortBy="#{row.concatenatedMrn}"
+						filterBy="#{row.concatenatedMrn}" filterMatchMode="contains"
+						filterStyle="width: 50px;">
+						<f:facet name="header">MRN</f:facet>
+						<h:outputLink value="#{caTissueUrl}/SimpleSearchEdit.do"
+							target="popupWindow">
+							<f:param name="aliasName" value="Participant" />
+							<f:param name="id" value="#{row.participantId}" />
+         #{row.concatenatedMrn}
+        </h:outputLink>
+
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.specimenLabel}"
+						filterBy="#{row.specimenLabel}" filterStyle="width: 50px;"
+						filterMatchMode="contains">
+						<f:facet name="header">Specimen Label</f:facet>
+						<h:outputLink target="popupWindow"
+							value="#{caTissueUrl}/SimpleSearchEdit.do">
+							<f:param name="aliasName" value="Specimen" />
+							<f:param name="id" value="#{row.inventoryId}" />
+          #{row.specimenLabel}
+        </h:outputLink>
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.diseaseDiagnosis}"
+						filterBy="#{row.diseaseDiagnosis}" filterStyle="width: 50px;"
+						filterMatchMode="contains">
+						<f:facet name="header">Disease Diagnosis</f:facet>
+						<h:outputText value="#{row.diseaseDiagnosis}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.diseaseSite}"
+						filterBy="#{row.diseaseSite}" filterStyle="width: 50px;"
+						filterMatchMode="contains">
+						<f:facet name="header">Disease Site</f:facet>
+						<h:outputText value="#{row.diseaseSite}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.specimenType}"
+						filterBy="#{row.specimenType}" filterStyle="width: 50px;">
+						<f:facet name="header">Specimen Type</f:facet>
+						<h:outputText value="#{row.specimenType}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.priorTreatment}"
+						filterBy="#{row.priorTreatment}" filterStyle="width: 50px;">
+						<f:facet name="header">Prior Treatment</f:facet>
+						<h:outputText value="#{row.priorTreatment}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.percentNecrosis}"
+						filterBy="#{row.percentNecrosis}" filterStyle="width: 50px;">
+						<f:facet name="header">% Necrosis</f:facet>
+						<h:outputText value="#{row.percentNecrosis}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.percentNuclei}"
+						filterBy="#{row.percentNuclei}" filterStyle="width: 50px;">
+						<f:facet name="header">% Nuclei</f:facet>
+						<h:outputText value="#{row.percentNuclei}" />
+					</p:column>
+
+					<p:column width="50" sortBy="#{row.specimenInitialAmount}"
+						filterBy="#{row.specimenInitialAmount}" filterStyle="width: 50px;">
+						<f:facet name="header">Initial Amount</f:facet>
+						<h:outputText value="#{row.specimenInitialAmount}" />
+					</p:column>
+
+					<p:column width="50" sortBy="#{row.specimenAmount}"
+						filterBy="#{row.specimenAmount}" filterStyle="width: 50px;">
+						<f:facet name="header">Available Amount</f:facet>
+						<h:outputText value="#{row.specimenAmount}" />
+					</p:column>
+
+					<p:column width="50" sortBy="#{row.shippedNaLab}">
+						<f:facet name="header">Shipped to NA Lab</f:facet>
+						<h:panelGroup rendered="#{row.shippedNaLab}">
+							<span class='ui-icon ui-icon-check'></span>
+						</h:panelGroup>
+
+					</p:column>
+				</p:dataTable>
+			</p:scrollPanel>
+			<p:scrollPanel mode="native">
+				<p:dataTable
+					rendered="#{reportManager.reportType == 'NA_LAB_REPORT'}"
+					styleClass="report" paginator="true" rows="15"
+					value="#{reportManager.naLabReport}" var="row" id="qcReportTable3"
+					currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					paginatorPosition="bottom"
+					filteredValue="#{reportManager.filteredNaLabReport}">
+
+					<p:column width="75" sortBy="#{row.aliquotLabel}"
+						filterBy="#{row.aliquotLabel}" filterStyle="width: 70px;"
+						filterMatchMode="contains">
+						<f:facet name="header">TCRB Aliquot Label</f:facet>
+						<h:outputLink target="popupWindow"
+							value="#{caTissueUrl}/SimpleSearchEdit.do">
+							<f:param name="aliasName" value="Specimen" />
+							<f:param name="id" value="#{row.aliquotSpecimen.id}" />
+             #{row.aliquotLabel}
+          </h:outputLink>
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.parentLabel}"
+						filterBy="#{row.parentLabel}" filterStyle="width: 70px;"
+						filterMatchMode="contains">
+						<f:facet name="header">Parent Specimen Label</f:facet>
+
+						<h:outputText value="#{row.parentLabel}" />
+
+
+					</p:column>
+
+
+					<p:column width="90" sortBy="#{row.concatenatedMrn}"
+						filterBy="#{row.concatenatedMrn}" filterMatchMode="contains"
+						filterStyle="width: 90px;">
+						<f:facet name="header">MRN</f:facet>
+						<h:outputLink value="#{caTissueUrl}/SimpleSearchEdit.do"
+							target="popupWindow">
+							<f:param name="aliasName" value="Participant" />
+							<f:param name="id" value="#{row.participant.id}" />
+         #{row.concatenatedMrn}
+        </h:outputLink>
+
+					</p:column>
+
+
+					<p:column width="95" sortBy="#{row.naLabId}"
+						filterBy="#{row.naLabId}" filterStyle="width: 90px;"
+						filterMatchMode="contains">
+						<f:facet name="header">NA Lab Id</f:facet>
+						<h:outputLink value="#{caTissueUrl}/SimpleSearchEdit.do"
+							target="popupWindow">
+							<f:param name="aliasName" value="Specimen" />
+							<f:param name="id" value="#{row.derivative.id}" />
+          #{row.naLabId}
+          </h:outputLink>
+					</p:column>
+
+					<p:column width="60" sortBy="#{row.naType}"
+						filterBy="#{row.naType}" filterStyleClass="autoWidth"
+						filterOptions="#{naTypeFilterOptions}">
+
+						<f:facet name="header">NA Type</f:facet>
+						<h:outputText value="#{row.naType}" />
+					</p:column>
+
+					<p:column width="75" sortBy="#{row.concentration}"
+						filterBy="#{row.concentration}" filterStyle="width: 75px;">
+						<f:facet name="header">Concentration (ng/&#181;l)</f:facet>
+						<h:outputText value="#{row.concentration}">
+							<f:convertNumber pattern="0.0#" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="50" sortBy="#{row.quantity}"
+						filterBy="#{row.quantity}" filterStyle="width: 50px;">
+						<f:facet name="header">Quantity (&#181;g)</f:facet>
+						<h:outputText value="#{row.quantity}">
+							<f:convertNumber pattern="0.0#" />
+						</h:outputText>
+					</p:column>
+
+					<p:column width="30" sortBy="#{row.rinValue}"
+						filterBy="#{row.rinValue}" filterStyle="width: 30px;">
+						<f:facet name="header">RIN Value</f:facet>
+						<h:outputText value="#{row.rinValue}" />
+					</p:column>
+
+					<p:column width="90" sortBy="#{row.quality}"
+						filterBy="#{row.quality}"
+						filterOptions="#{dnaQualityFilterOptions}"
+						filterStyleClass="autoWidth">
+						<f:facet name="header">Gel Metrics</f:facet>
+						<h:outputText value="#{row.quality.toString()}" />
+					</p:column>
+				</p:dataTable>
+			</p:scrollPanel>
+
+			<p:scrollPanel mode="native">
+				<p:dataTable
+					rendered="#{reportManager.reportType !='QC_REPORT' and reportManager.reportType != 'NA_LAB_REPORT' and reportManager.reportType != null}"
+					styleClass="report" paginator="true" rows="10"
+					value="#{reportManager.qcReport}" var="row" id="qcReportTable2"
+					currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					paginatorPosition="bottom"
+					filteredValue="#{reportManager.filteredNotifications}">
+					<p:column sortBy="#{row.concatenatedMrn}"
+						filterBy="#{row.concatenatedMrn}" filterMatchMode="contains"
+						style="max-width: 200px;">
+						<f:facet name="header">MRN</f:facet>
+						<h:outputLink value="#{caTissueUrl}/SimpleSearchEdit.do"
+							target="popupWindow">
+							<f:param name="aliasName" value="Participant" />
+							<f:param name="id" value="#{row.participantId}" />
+         #{row.concatenatedMrn}
+        </h:outputLink>
+					</p:column>
+
+					<p:column sortBy="#{row.specimenLabel}"
+						filterBy="#{row.specimenLabel}" filterMatchMode="contains">
+						<f:facet name="header">Specimen Label</f:facet>
+						<h:outputText value="#{row.specimenLabel}" />
+					</p:column>
+
+					<p:column sortBy="#{row.diseaseDiagnosis}"
+						filterBy="#{row.diseaseDiagnosis}" filterMatchMode="contains">
+						<f:facet name="header">Disease Diagnosis</f:facet>
+						<h:outputText value="#{row.diseaseDiagnosis}" />
+					</p:column>
+
+					<p:column sortBy="#{row.diseaseSite}" filterBy="#{row.diseaseSite}"
+						filterMatchMode="contains">
+						<f:facet name="header">Disease Site</f:facet>
+						<h:outputText value="#{row.diseaseSite}" />
+					</p:column>
+
+					<p:column sortBy="#{row.collectionSite}"
+						filterBy="#{row.collectionSite}">
+						<f:facet name="header">Collection Site</f:facet>
+						<h:outputText value="#{row.collectionSite}" />
+					</p:column>
+
+					<p:column sortBy="#{row.specimenInitialAmount}"
+						filterBy="#{row.specimenInitialAmount}">
+						<f:facet name="header">Initial Specimen Amount</f:facet>
+						<h:outputText value="#{row.specimenInitialAmount}" />
+					</p:column>
+
+					<p:column id="shipTCGACol"
+						rendered="#{reportManager.reportType=='FULLY_QUALIFIED'}">
+						<f:facet name="header">Ship to TCGA</f:facet>
+						<h:panelGroup id="tcgaGroup">
+							<p:commandButton value="Ship"
+								action="#{reportManager.shipToTcga(row)}" update="tcgaGroup"
+								rendered="#{!row.shippedTCGA}" />
+							<h:panelGroup rendered="#{row.shippedTCGA}">
+								<span class="ui-icon ui-icon-check"></span>
+							</h:panelGroup>
+						</h:panelGroup>
+					</p:column>
+
+				</p:dataTable>
+			</p:scrollPanel>
+			<br />
+			<br />
+			<p:commandButton value="Export" ajax="false"
+				rendered="#{reportManager.reportType == 'QC_REPORT'}"
+				onclick="PrimeFaces.monitorDownload(start, stop)"
+				icon="ui-icon-arrowthick-1-s">
+				<p:fileDownload value="#{reportExporter.createQCFile}" />
+			</p:commandButton>
+
+			<p:commandButton value="Export" ajax="false"
+				rendered="#{reportManager.reportType == 'NA_LAB_REPORT'}"
+				onclick="PrimeFaces.monitorDownload(start, stop)"
+				icon="ui-icon-arrowthick-1-s">
+				<p:fileDownload value="#{reportExporter.createNaLabFile}" />
+			</p:commandButton>
+
+			<p:commandButton value="Export" ajax="false"
+				rendered="#{reportManager.reportType != 'QC_REPORT' and reportManager.reportType != 'NA_LAB_REPORT' and reportManager.reportType != null}"
+				onclick="PrimeFaces.monitorDownload(start, stop)"
+				icon="ui-icon-arrowthick-1-s">
+				<p:fileDownload value="#{reportExporter.createReportFile}" />
+			</p:commandButton>
+		</h:form>
+	</p:panel>
+
+
+</ui:composition>

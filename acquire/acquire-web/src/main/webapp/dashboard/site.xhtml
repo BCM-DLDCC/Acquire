@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<ui:repeat var="site" value="#{sites}">
+		<p:panel toggleable="true"	header="#{site.name} - #{site.totalSamples} Total : #{site.qualified} Qualified" collapsed = "true">
+			<span class = "siteHeader">Site Totals<br/></span>
+			<span class = "siteWeeks">Samples in last two weeks: #{site.twoWeeks} Samples in last week: #{site.lastWeek}</span>
+			<ui:include src="/dashboard/totals.xhtml">
+				<ui:param name="scoreboard" value="#{site}" />
+			</ui:include>
+			<br/>
+			<ui:repeat var="childSite" value="#{site.children}">
+				<span class = "childSiteHeader">#{childSite.name}<br/></span>
+				<span class = "siteWeeks">Samples in last two weeks: #{childSite.twoWeeks} Samples in last week: #{childSite.lastWeek}</span>
+				<ui:include src="/dashboard/totals.xhtml">
+					<ui:param name="scoreboard" value="#{childSite}" />
+					<ui:param name = "altStyle" value = "childSite"/>
+				</ui:include>
+				<br/>
+			</ui:repeat>
+		</p:panel>
+	</ui:repeat>
+
+</ui:composition>
+

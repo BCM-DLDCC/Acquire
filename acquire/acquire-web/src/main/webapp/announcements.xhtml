@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+		<p:layout id="announcementParent" style="height:700px;">
+			<p:layoutUnit position="west" size="600" style="padding: 10px;">
+				<h:form>
+					<p:panel header="Enter a new announcement here"
+						id="newAnnouncement">
+
+						<p:outputLabel for="announcementText" value="Announcement Text" />
+						<p:editor height="200" width="550"
+							value="#{announcementManager.text}" id="announcementText"
+							required="true" />
+						
+						<br />
+						<br />
+						<p:outputLabel for="announcementExpDate" value="Expires On" />
+						<br />
+						<p:calendar id="announcementExpDate"
+							value="#{announcementManager.expiration}" />
+						<br />
+						<br />
+						<p:commandButton value="Create Announcement"
+							action="#{announcementManager.createAnnouncement}"
+							update="newAnnouncement,:announcementList" />
+						<br />
+						<br />
+						<p:growl life = "4000" autoUpdate="true"/>
+					</p:panel>
+
+
+				</h:form>
+			</p:layoutUnit>
+
+			<p:layoutUnit position="center" size="400" style="padding: 10px;">
+				<p:panel id="announcementList">
+				<h:outputText value = "There are no announcements in the system." rendered = "#{announcements.size() == 0}"/>
+					<ui:repeat var="announcement" value="#{announcements}">
+						<p:panel header="Announcement" style="margin: 5px;">
+				<h:outputText value = "#{announcement.text}" escape = "false"/>
+				<hr />
+				Expires: <h:outputText value = "#{announcement.expireDate}" rendered = "#{! empty announcement.expireDate}">
+						<f:convertDateTime pattern = "MMM d yyyy"/>
+					</h:outputText>
+					
+					<h:outputText value = "Never" rendered = "#{empty announcement.expireDate}"/>
+				<br />
+							<br />
+							<p:commandButton value="Delete"
+								action="#{announcementManager.removeAnnouncement(announcement)}"
+								update=":announcementList" />
+						</p:panel>
+					</ui:repeat>
+				</p:panel>
+			</p:layoutUnit>
+
+		</p:layout>
+
+	</ui:define>
+
+</ui:composition>

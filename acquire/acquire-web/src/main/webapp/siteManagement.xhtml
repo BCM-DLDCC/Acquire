@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+
+		<h:form id="siteForm">
+
+<p:tabView id="siteData">
+
+        <p:tab id="programSite" title="Add Sites to Programs">
+
+			<p:selectOneMenu value="#{acquirePermissionManager.program}"
+				id="programs" effectDuration="100">
+				<f:selectItem itemLabel="Select Program" itemValue="" />
+				<f:selectItems value="#{acquirePermissionManager.allPrograms}" />
+			</p:selectOneMenu>
+
+			<p:selectOneMenu id="sites" value="#{acquirePermissionManager.site}"
+				effectDuration="100">
+				<f:selectItem itemLabel="Select Site" itemValue="" />
+				<f:selectItems value="#{acquirePermissionManager.getAllSites}" />
+			</p:selectOneMenu>
+			
+			<p:commandButton value="Add Site to Program" 
+			action="#{acquirePermissionManager.addSiteToProgram}" />
+			</p:tab>
+			
+			</p:tabView>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

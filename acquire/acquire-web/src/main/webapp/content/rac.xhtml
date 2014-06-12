@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces">
+
+	<h1>RAC</h1>
+
+
+
+	<p:growl id="messages" />
+	<h:form id="inboxForm">
+		<p:scrollPanel mode="native">
+			<p:dataTable id="chairInbox" paginatorPosition="bottom"
+				paginator="true" var="racApplication"
+				value="#{applicationManager.inbox}" rows="10"
+				widgetVar="chairInboxTable" styleClass="report"
+				currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+				paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				style="overflow: scroll;" rowIndexVar="index"
+				rowKey="#{racApplication.id}"
+				rendered="#{authorizations.isRacChair(currentProgram)}">
+
+
+				<f:facet name="header">
+			RAC Coordinator Inbox
+			</f:facet>
+
+				<p:column headerText="Application ID">
+					<h:outputText value="#{racApplication.id}" />
+				</p:column>
+
+				<p:column headerText="Submitter Name">
+					<h:outputText value="#{racApplication.investigator.firstName}" />
+					<h:outputText value=" " />
+					<h:outputText value="#{racApplication.investigator.lastName}" />
+				</p:column>
+
+				<p:column headerText="Title">
+					<h:link outcome="/apply.jsf"
+						value="#{racApplication.project.projectTitle}"
+						includeViewParams="true" onclick="mainBlock.show();">
+						<f:param name="id" value="#{racApplication.id}" />
+					</h:link>
+				</p:column>
+
+				<p:column headerText="Application Date">
+					<h:outputText value="#{racApplication.submissionDate}">
+						<f:convertDateTime pattern="MM-dd-yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Status">
+					<h:outputText value="#{racApplication.applicationStatus.toString}" />
+				</p:column>
+
+				<p:column headerText="Reviewers">
+
+					<p:commandButton value="Edit List" id="editReviewButton"
+						action="#{reviewerManager.initList(racApplication)}"
+						onstart="mainBlock.show();"
+						oncomplete="reviewDlg.show();mainBlock.hide();"
+						update=":mainContent:reviewForm"/>
+					
+					<p:commandButton value="Votes" id="reviewButton"
+						action="#{applicationManager.setApplication(racApplication)}"
+						onstart="mainBlock.show();"
+						oncomplete="voteDlg.show();mainBlock.hide();"
+						update=":mainContent:voteForm"
+						rendered="#{racApplication.currentReviewers.size != 0}" />
+
+				</p:column>
+
+				<p:column headerText="Docs">
+					<p:commandButton id="uploadButton" icon="ui-icon-document"
+						value="Add"
+						action="#{applicationManager.setApplication(racApplication)}"
+						onstart="mainBlock.show();"
+						oncomplete="uploadDlg.show();mainBlock.hide();"
+						update=":mainContent:uploadForm" multiple="true" advanced="true" />
+
+					<p:commandButton value="View" id="docsButton"
+						rendered="#{racApplication.reviewDocuments.size > 0}">
+						<f:param name="tab" value="3" />
+					</p:commandButton>
+					<p:overlayPanel for="docsButton" dynamic="false">
+						<p:dataTable value="#{racApplication.reviewDocuments.toArray()}"
+							var="document" id="docPanel">
+							<p:column headerText="View File">
+								<p:commandButton id="reportDownloadButton"
+									value="#{document.fileName}" ajax="false"
+									onclick="PrimeFaces.monitorDownload(start, stop)"
+									icon="ui-icon-arrowthick-1-s" style="float: left">
+									<p:fileDownload value="#{files.downloadFile(document)}" />
+								</p:commandButton>
+							</p:column>
+							<p:column headerText="Delete File">
+								<p:commandButton id="reportRemoveButton" icon="ui-icon-trash"
+									action="#{applicationManager.removeReviewDocument(document)}"
+									update="docPanel">
+									<f:setPropertyActionListener value="#{racApplication}"
+										target="#{applicationManager.application}" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+
+					</p:overlayPanel>
+				</p:column>
+
+			</p:dataTable>
+		</p:scrollPanel>
+		<p:scrollPanel mode="native">
+			<p:dataTable id="inbox" paginatorPosition="bottom" paginator="true"
+				var="racApplication" value="#{applicationManager.inbox}" rows="10"
+				widgetVar="inboxTable" styleClass="report"
+				currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+				paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				style="overflow: scroll;" rowIndexVar="index"
+				rowKey="#{racApplication.id}"
+				rendered="#{authorizations.isRacMember(currentProgram) and not authorizations.isRacChair(currentProgram)}">
+
+
+				<f:facet name="header">
+      RAC Inbox
+      </f:facet>
+
+				<p:column headerText="Application ID">
+					<h:outputText value="#{racApplication.id}" />
+				</p:column>
+
+				<p:column headerText="Submitter Name">
+					<h:outputText value="#{racApplication.investigator.firstName}" />
+					<h:outputText value="#{racApplication.investigator.lastName}" />
+				</p:column>
+
+				<p:column headerText="Title">
+					<h:link outcome="/apply.jsf"
+						value="#{racApplication.project.projectTitle}"
+						includeViewParams="true" onclick="mainBlock.show();">
+						<f:param name="id" value="#{racApplication.id}" />
+					</h:link>
+				</p:column>
+
+				<p:column headerText="Docs">
+					<h:outputText value="NA"
+						rendered="#{empty racApplication.reviewDocuments}" />
+					<p:commandButton value="View" id="docsButton"
+						rendered="#{not empty racApplication.reviewDocuments}" />
+					<p:overlayPanel for="docsButton" dynamic="false">
+						<ui:repeat value="#{racApplication.reviewDocuments.toArray()}"
+							var="document" id="docPanel">
+
+							<p:commandButton id="reportDownloadButton"
+								value="#{document.fileName}" ajax="false"
+								onclick="PrimeFaces.monitorDownload(start, stop)"
+								icon="ui-icon-arrowthick-1-s" style="float: left">
+								<p:fileDownload value="#{files.downloadFile(document)}" />
+							</p:commandButton>
+
+						</ui:repeat>
+					</p:overlayPanel>
+				</p:column>
+
+				<p:column headerText="Application Date">
+					<h:outputText value="#{racApplication.submissionDate}">
+						<f:convertDateTime pattern="MM-dd-yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Status">
+					<h:outputText
+						value="#{racApplication.applicationStatus.toString()}" />
+				</p:column>
+
+				<p:column headerText="Reviewers">
+					<p:commandButton value="View List" id="reviewButton" />
+					<p:overlayPanel for="reviewButton" dynamic="false">
+						<p:dataTable value="#{racApplication.currentReviewers}"
+							var="review">
+							<p:column headerText="Reviewer">
+								<h:outputText value="#{review.fullName}" />
+							</p:column>
+							<p:column headerText="Vote">
+								<h:outputText
+									value="#{racApplication.reviewers[review].vote.toString()}" />
+							</p:column>
+							<p:column headerText="Vote Recorded By">
+								<h:outputText
+									value="#{racApplication.reviewers[review].recordingUser.fullName}" />
+							</p:column>
+
+						</p:dataTable>
+					</p:overlayPanel>
+				</p:column>
+				
+				<p:column headerText="Current Vote">
+        <h:outputText
+            value="#{racApplication.reviewers[currentUser].vote.toString()}"
+            />
+        </p:column>
+
+				<p:column headerText="Vote">
+					<p:selectOneMenu value="#{applicationManager.vote}">
+						<f:selectItem itemLabel="Vote" itemValue="NOT_VOTED"
+							noSelectionOption="true" />
+						<f:selectItem itemLabel="Yes" itemValue="YES" />
+						<f:selectItem itemLabel="No" itemValue="NO" />
+						<p:ajax event="change"
+							listener="#{applicationManager.processVote(currentUser, racApplication)}"
+							onstart="mainBlock.show();" onsuccess="mainBlock.hide();"
+							update=":mainContent:messages, :mainContent:inboxForm:inbox">
+						</p:ajax>
+					</p:selectOneMenu>
+				</p:column>
+
+			</p:dataTable>
+		</p:scrollPanel>
+	</h:form>
+
+	<h:form id="archiveForm" style="margin-top:10px">
+		<p:outputPanel id="searchInput">
+			<p:inputText value="#{applicationSearch.searchValue}"
+				id="archiveSearch" style="position: relative;"
+				converter="#{applicationSearch.searchField.valueConverter}" />
+			<p:watermark for="archiveSearch" value="Search Archive" />
+
+			<p:outputLabel id="archiveLabel" for="archiveFieldsDropdown"
+				value="Search by: "
+				rendered="#{applicationSearch.searchField eq 'SUBMISSION_DATE'}"
+				style="position: relative;">
+				<image class="ui-icon ui-icon-info" style="display: inline-block;" />
+			</p:outputLabel>
+			<p:outputLabel for="archiveFieldsDropdown" value="Search by: "
+				rendered="#{applicationSearch.searchField ne 'SUBMISSION_DATE'}"
+				style="position: relative;" />
+
+			<p:tooltip for="archiveLabel"
+				rendered="#{applicationSearch.searchField eq 'SUBMISSION_DATE'}"
+				value="Please enter date in MM/YYYY format. This will return all applications with a submission date during the month entered." />
+			<p:selectOneMenu value="#{applicationSearch.searchField}"
+				id="archiveFieldsDropdown" style="bottom:-8px;">
+				<f:selectItems value="#{applicationSearch.fieldList}" var="field"
+					itemLabel="#{field}" itemValue="#{field}" />
+				<p:ajax event="change" process="searchInput" update="searchInput" />
+			</p:selectOneMenu>
+
+			<p:commandButton value="Go" action="#{applicationSearch.search}"
+				id="archiveSearchButton" update="archive"
+				style="position: relative;" onstart="mainBlock.show();"
+				oncomplete="mainBlock.hide();" />
+
+		</p:outputPanel>
+		<p:scrollPanel mode="native">
+			<p:dataTable id="archive" widgetVar="archiveTble"
+				paginatorPosition="bottom" styleClass="report"
+				value="#{applicationSearch.results}" var="racApplication"
+				paginator="true" rows="10"
+				currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+				paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+				rowKey="#{racApplication.id}" rowIndexVar="archiveIndex">
+
+				<f:facet name="header">
+			Application Archive
+		</f:facet>
+
+				<p:column headerText="Application ID">
+					<h:outputText value="#{racApplication.id}" />
+				</p:column>
+
+				<p:column headerText="Submitter Name">
+					<h:outputText value="#{racApplication.investigator.firstName}" />
+					<h:outputText value="#{racApplication.investigator.lastName}" />
+				</p:column>
+
+				<p:column headerText="Title">
+					<h:link outcome="/apply.jsf"
+						value="#{racApplication.project.projectTitle}"
+						includeViewParams="true" onclick="mainBlock.show();">
+						<f:param name="id" value="#{racApplication.id}" />
+					</h:link>
+				</p:column>
+
+				<p:column headerText="Docs">
+					<h:outputText value="--"
+						rendered="#{racApplication.reviewDocuments.size eq 0}" />
+					<p:commandButton value="View" id="docsButton"
+						rendered="#{racApplication.reviewDocuments.size > 0}" />
+					<p:overlayPanel for="docsButton" dynamic="false"
+						showCloseIcon="true">
+
+						<ui:repeat value="#{racApplication.reviewDocuments.toArray()}"
+							var="document" id="docPanel">
+
+							<p:commandButton id="reportDownloadButton"
+								value="#{document.fileName}" ajax="false"
+								onclick="PrimeFaces.monitorDownload(start, stop)"
+								icon="ui-icon-arrowthick-1-s" style="float: left">
+								<p:fileDownload value="#{files.downloadFile(document)}" />
+							</p:commandButton>
+
+
+						</ui:repeat>
+					</p:overlayPanel>
+				</p:column>
+
+				<p:column headerText="Application Date">
+					<h:outputText value="#{racApplication.submissionDate}">
+						<f:convertDateTime pattern="MM-dd-yyyy" />
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Status">
+					<h:outputText
+						value="#{racApplication.applicationStatus.toString()}" />
+				</p:column>
+
+				<p:column headerText="Reviewers">
+					<p:commandButton value="View Votes" id="voteButton" />
+					<p:overlayPanel for="voteButton" dynamic="false">
+						<p:dataTable value="#{racApplication.currentReviewers}"
+							var="review">
+							<p:column headerText="Reviewer">
+								<h:outputText value="#{review.fullName}" />
+							</p:column>
+							<p:column headerText="Vote">
+								<h:outputText value="#{racApplication.reviewers[review].vote}" />
+							</p:column>
+							<p:column headerText="Vote Recorded By">
+								<h:outputText
+									value="#{racApplication.reviewers[review].recordingUser.fullName}" />
+							</p:column>
+
+						</p:dataTable>
+					</p:overlayPanel>
+				</p:column>
+
+			</p:dataTable>
+		</p:scrollPanel>
+	</h:form>
+
+	<p:dialog header="Upload Document" resizable="false"
+		widgetVar="uploadDlg" modal="true" id="uploadDialog">
+		<h:form id="uploadForm">
+			<p:outputPanel id="uploadPanel">
+				<p:fileUpload id="reportUpload"
+					fileUploadListener="#{applicationManager.addReviewDocument}"
+					advanced="true" multiple="true"
+					update=":mainContent:inboxForm:chairInbox"
+					oncomplete="uploadDlg.hide();" />
+			</p:outputPanel>
+
+		</h:form>
+	</p:dialog>
+
+	<p:dialog header="Votes" resizable="true" widgetVar="voteDlg"
+		modal="true" id="voteDialog">
+		<h:form id="voteForm">
+			<ui:param name="currentApplication"
+				value="#{applicationManager.application}" />
+			<p:dataTable value="#{currentApplication.currentReviewers}"
+				var="review">
+
+				<p:column headerText="Reviewer">
+					<h:outputText value="#{review.fullName}" />
+				</p:column>
+
+				<p:column headerText="Vote">
+					<h:outputText
+						value="#{currentApplication.reviewers[review].vote.toString()}"
+						rendered="#{currentApplication.reviewers[review].vote ne 'NOT_VOTED'}" />
+					<p:selectOneMenu value="#{applicationManager.vote}"
+						rendered="#{currentApplication.reviewers[review].vote eq 'NOT_VOTED'}">
+						<f:selectItem itemLabel="Vote" itemValue="NOT_VOTED"
+							noSelectionOption="true" />
+						<f:selectItem itemLabel="Yes" itemValue="YES" />
+						<f:selectItem itemLabel="No" itemValue="NO" />
+						<p:ajax listener="#{applicationManager.processVote(review)}"
+							update=":mainContent:messages, :mainContent:voteForm"
+							onstart="voteBlock.show();" oncomplete="voteBlock.hide();" />
+
+					</p:selectOneMenu>
+				</p:column>
+
+				<p:column headerText="Vote Recorded By">
+					<h:outputText
+						value="#{currentApplication.reviewers[review].recordingUser.fullName}"
+						rendered="#{currentApplication.reviewers[review].vote ne 'NOT_VOTED'}" />
+				</p:column>
+
+				<p:column>
+					<p:commandButton
+						rendered="#{currentApplication.reviewers[review].vote ne 'NOT_VOTED'}"
+						action="#{applicationManager.processVote(review)}"
+						update=":mainContent:messages, :mainContent:voteForm"
+						onstart="voteBlock.show();" oncomplete="voteBlock.hide();"
+						icon="ui-icon-close">
+						<f:setPropertyActionListener target="#{applicationManager.vote}"
+							value="NOT_VOTED" />
+					</p:commandButton>
+				</p:column>
+
+			</p:dataTable>
+			<p:commandButton onclick="voteDlg.hide()" value="Close" />
+			<p:blockUI block=":mainContent:voteForm" widgetVar="voteBlock">
+				<h:graphicImage library="img" name="ajax-loader.gif" />
+			</p:blockUI>
+		</h:form>
+
+	</p:dialog>
+
+
+	<p:dialog header="Assign Reviewers" resizable="true"
+		widgetVar="reviewDlg" modal="true" id="reviewDialog">
+		<h:form id="reviewForm">
+			<p:pickList id="reviewerPicker"
+				value="#{reviewerManager.reviewerModel}" var="member"
+				itemLabel="#{member.fullName}" itemValue="#{member}"
+				converter="objectConverter" />
+			<p:commandButton action="#{reviewerManager.assignReviewers}"
+				update=":mainContent:inboxForm:chairInbox, :mainContent:messages"
+				oncomplete="reviewDlg.hide(); reviewBlock.hide();"
+				onstart="reviewBlock.show();" value="Save and Send Notification" />
+			<p:blockUI block="reviewForm" widgetVar="reviewBlock">
+				<h:graphicImage library="img" name="ajax-loader.gif" />
+			</p:blockUI>
+		</h:form>
+
+
+	</p:dialog>
+
+
+
+
+</ui:composition>

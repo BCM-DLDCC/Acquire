@@ -1,0 +1,93 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>acquire</artifactId>
+		<groupId>edu.bcm.dldcc.big</groupId>
+		<version>2.3.4.Final</version>
+		<relativePath>..</relativePath>
+	</parent>
+	<artifactId>admin-persistence</artifactId>
+	<name>Acquire Admin Persistence</name>
+	<description>Entities for Acquire Admin</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate.javax.persistence</groupId>
+			<artifactId>hibernate-jpa-2.0-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.seam.security</groupId>
+			<artifactId>seam-security-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>edu.bcm.dldcc.big</groupId>
+			<artifactId>dldcc-common</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-envers</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>edu.bcm.dldcc.big</groupId>
+			<artifactId>acquire-utility</artifactId>
+			<scope>provided</scope>
+			<classifier>${deployment}</classifier>
+		</dependency>
+		<dependency>
+			<groupId>edu.bcm.dldcc.big</groupId>
+			<artifactId>dldcc-iso21090</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<classifier>${deployment}</classifier>
+
+				</configuration>
+			</plugin>
+			
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+		</plugins>
+	</build>
+	<scm>
+    <url>svn://svn.dldcc.bcm.edu/svn/repo/acquire_2</url>
+    <developerConnection>scm:svn:svn://svn.dldcc.bcm.edu:3690/acquire_2.x</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+</project>

@@ -1,0 +1,17 @@
+Dear ${name},
+ 
+Your request for an account to the Texas Cancer Research Biobank application Acquire has been processed.
+ 
+Your login details for Acquire are:
+Login Name : ${username}
+Password : ${password}
+
+To access the application, use the following link: https://acquire.research.bcm.edu/
+ 
+The homepage contains brief instructions for use, and you may also download the User Guide from the Help menu.
+ 
+If you need to contact an administrator of the software, please email us at tcrbsupport@breastcenter.tmc.edu.
+ 
+Thank you,
+ 
+The Texas Cancer Research Biobank

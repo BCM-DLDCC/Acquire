@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+		<p:breadCrumb>
+			<p:menuitem value="Home" url="./index.jsf" />
+			<p:menuitem value="Manage Users" url="./reviewUsers.jsf">
+				<f:param name="cid" value="#{conversation.id}" />
+			</p:menuitem>
+		</p:breadCrumb>
+		<br />
+		<h:form id="reviewUsersForm">
+			<p:growl id="messages" />
+			<p:dataTable id="usersTable" var="user" value="#{pendingUsers}"
+				paginatorPosition="bottom" paginator="true" rows="25">
+
+				<f:facet name="header">Requested Accounts</f:facet>
+
+				<p:column id="firstName" sortBy="#{user.firstName}"
+					headerText="First Name">
+					<h:outputText value="#{user.firstName}" />
+				</p:column>
+
+				<p:column id="lastName" sortBy="#{user.lastName}"
+					headerText="Last Name">
+					<h:outputText value="#{user.lastName}" />
+				</p:column>
+
+				<p:column id="email" sortBy="#{user.email}"
+					headerText="Email Address">
+					<h:outputText value="#{user.email.value}" />
+				</p:column>
+
+				<p:column id="institution" sortBy="#{user.institution}"
+					headerText="Institution">
+					<h:outputText value="#{user.institution}" />
+				</p:column>
+
+				<p:column id="affiliation" sortBy="#{user.affiliation}"
+					headerText="TCRB Affiliation">
+					<h:outputText value="#{user.affiliation}" />
+				</p:column>
+
+				<p:column id="reviewUser">
+					<p:commandButton value="Review" action="public/requestAccount"
+						ajax="false" onstart="reviewUsersBlock.show();"
+						oncomplete="reviewUsersBlock.hide();">
+						<f:setPropertyActionListener target="#{userManager.user}"
+							value="#{user}" />
+					</p:commandButton>
+				</p:column>
+
+				<p:column id="approveUser">
+					<p:commandButton id="approveButton" value="Approve"
+						action="#{userManager.approveAccount(user)}" 
+						update=":reviewUsersForm:messages, usersTable"
+						onstart="reviewUsersBlock.show();"
+						oncomplete="reviewUsersBlock.hide();" />
+				</p:column>
+
+				<p:column id="rejectUser">
+					<p:commandButton id="rejectButton" value="Reject"
+						action="#{userManager.rejectAccount(user)}"
+						update=":reviewUsersForm:messages, usersTable" 
+						onstart="reviewUsersBlock.show();"
+						oncomplete="reviewUsersBlock.hide();"/>
+				</p:column>
+
+			</p:dataTable>
+
+			<p:blockUI block="usersTable" widgetVar="reviewUsersBlock">
+				<h:graphicImage library="img" name="ajax-loader.gif" />
+			</p:blockUI>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

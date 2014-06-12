@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+
+		<h:form id="shipmentSearchForm">
+			<div>
+				<h1>Search Specimen for Shipping</h1>
+				<p:outputPanel id="searchPanel">
+					<p:inputText id="specimenSearch"
+						style="position: relative; bottom: 8px; margin-right: 10px;"
+						value="#{reportManager.searchTerm}"
+						converter="#{reportManager.searchField.valueConverter}" />
+					<p:watermark for="specimenSearch" value="Search for specimens" />
+					<p:outputLabel for="pathFieldsDropdown" value="Search by: "
+						style="position: relative; bottom:8px;" />
+					<p:selectOneMenu value="#{reportManager.searchField}"
+						style="width: 188px;" id="pathFieldsDropdown">
+						<f:selectItems value="#{reportManager.getSearchFields}" />
+						<p:ajax event="change" update="searchPanel" process="searchPanel" />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Go"
+						action="#{reportManager.runShipmentFormReport}"
+						styleClass="pathSearchButton" id="pathSearchButton" 
+						update=":specimenForm"
+						onstart="shipmentBlock.show();" oncomplete="shipmentBlock.hide();" />
+
+					<div style="float: right;">
+						<p:selectOneMenu value="#{reportManager.collectionSite}"
+							style="width: 204px;">
+							<f:selectItem itemLabel="All Sites" itemValue="" />
+							<f:selectItems value="#{currentSites}" />
+						</p:selectOneMenu>
+					</div>
+				</p:outputPanel>
+
+			</div>
+		</h:form>
+		<h:form id="specimenForm">
+
+			<p:growl life="4000" id="messages" />
+			<p:scrollPanel mode="native">
+				<p:dataTable id="tumorTable" paginatorPosition="bottom"
+					paginator="true" var="result"
+					value="#{reportManager.shipmentReport}" rows="15"
+					widgetVar="tumorTable" styleClass="report"
+					selection="#{data.selectedShipment}" selectionMode="multiple"
+					rowKey="#{result.uuid}"
+					currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}">
+
+					<f:facet name="header">
+			Search Results
+			</f:facet>
+
+
+					<p:column id="label" sortBy="#{result.specimenLabel}" width="110">
+						<f:facet name="header">
+							<h:outputText value="Label" />
+						</f:facet>
+						<h:outputText value="#{result.specimenLabel}" />
+
+					</p:column>
+
+					<p:column id="barcode" sortBy="#{result.specimenBarcode}">
+						<f:facet name="header">
+							<h:outputText value="Barcode" />
+						</f:facet>
+						<h:outputText value="#{result.specimenBarcode}" />
+					</p:column>
+
+					<p:column id="acquirePatientId" sortby="#{result.acquirePatientId}"
+						sortBy="#{result.acquirePatientId}">
+						<f:facet name="header">
+							<h:outputText value="Acquire Patient Id" />
+						</f:facet>
+						<h:outputText value="#{result.acquirePatientId}" />
+					</p:column>
+					<p:column id="caTissuePatientId" sortBy="#{result.participantId}">
+						<f:facet name="header">
+							<h:outputText value="caTissue Patient Id" />
+						</f:facet>
+						<h:outputText value="#{result.participantId}" />
+					</p:column>
+					<p:column id="patientId" width="100"
+						sortBy="#{result.concatenatedMrn}">
+						<f:facet name="header">
+							<h:outputText value="MRN" />
+						</f:facet>
+						<h:outputText value="#{result.concatenatedMrn}" />
+					</p:column>
+
+					<p:column id="specType" width="75" sortBy="#{result.type}">
+						<f:facet name="header">
+							<h:outputText value="Specimen Type" />
+						</f:facet>
+						<h:outputText value="#{result.type}" />
+					</p:column>
+
+					<p:column id="collectionSite" width="100"
+						sortBy="#{result.collectionSite}">
+						<f:facet name="header">
+							<h:outputText value="Collection Site" />
+						</f:facet>
+						<h:outputText value="#{result.collectionSite}" />
+					</p:column>
+
+					<p:column id="naLabShipping" sortBy="#{result.shippedNaLab}">
+						<f:facet name="header">
+							<h:outputText value="Shipped to NaLab" />
+						</f:facet>
+						<h:graphicImage rendered="#{result.shippedNaLab}"
+							url="resources/img/true.png" />
+					</p:column>
+
+					<p:column id="addSpecimen">
+						<p:commandButton value="Add" icon="ui-icon-plus"
+							action="#{naLabShipmentForm.addSpecimen(result)}"
+							rendered="#{!result.shippedNaLab}"
+							update=":specimenForm:messages" onstart="shipmentBlock.show();"
+							oncomplete="shipmentBlock.hide();" />
+
+					</p:column>
+
+				</p:dataTable>
+			</p:scrollPanel>
+			<p:commandButton value="Clear results"
+				action="#{reportManager.clearShipmentReport}" update="tumorTable"
+				onstart="shipmentBlock.show();" oncomplete="shipmentBlock.hide();" />
+
+			<p:commandButton value="Add selected to NA Lab Shipment Form"
+				action="#{naLabShipmentForm.addSpecimens}"
+				update=":specimenForm:messages" onstart="shipmentBlock.show();"
+				oncomplete="shipmentBlock.hide();" />
+
+			<p:commandButton value="View NA Lab Shipment Form"
+				action="naLabShipmentForm" ajax="false"
+				onstart="shipmentBlock.show();" />
+		</h:form>
+
+		<br />
+		<p:separator />
+		<br />
+		<h:form id="naLabForm">
+			<h1>Search Existing Shipment Forms</h1>
+			<p:outputPanel id="searchInput">
+				<p:inputText value="#{naLabShipmentSearch.searchValue}"
+					id="naLabSearch" style="position: relative; bottom:8px;"
+					rendered="#{naLabShipmentSearch.searchField ne 'COLLECTION_SITE'}"
+					converter="#{naLabShipmentSearch.searchField.valueConverter}" />
+				<p:watermark for="naLabSearch"
+					value="Search Existing NA Lab Shipment Forms" />
+				<p:selectOneMenu value="#{naLabShipmentSearch.searchValue}"
+					rendered="#{naLabShipmentSearch.searchField.searchCriteria.hasPermissibleValues}"
+					converter="#{naLabShipmentSearch.searchField.valueConverter}">
+					<f:selectItems value="#{collectionSiteList}" var="site"
+						itemLabel="#{site.name}" itemValue="#{site}" />
+				</p:selectOneMenu>
+				<p:outputLabel for="naLabFieldsDropdown" value="Search by: "
+					style="position: relative; bottom:8px;" />
+				<p:selectOneMenu value="#{naLabShipmentSearch.searchField}"
+					id="naLabFieldsDropdown">
+					<f:selectItems value="#{naLabShipmentSearch.fieldList}" var="field"
+						itemLabel="#{field}" itemValue="#{field}" />
+					<p:ajax event="change" process="searchInput" update="searchInput" />
+				</p:selectOneMenu>
+			</p:outputPanel>
+
+			<p:commandButton value="Go" action="#{naLabShipmentSearch.search}"
+				id="naLabSearchButton" update="naLab, :specimenForm:messages"
+				style="position: relative; bottom:8px;" onstart="naLabBlock.show();"
+				oncomplete="naLabBlock.hide();" />
+
+			<p:scrollPanel mode="native">
+				<p:dataTable id="naLab" widgetVar="naLabTble"
+					paginatorPosition="bottom" styleClass="report"
+					value="#{naLabShipmentSearch.results}" var="naLabShipment"
+					paginator="true" rows="10"
+					currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					rowKey="#{naLabShipment.id}" rowIndexVar="naLabIndex">
+					<f:facet name="header">NA Lab Shipment Forms</f:facet>
+					<p:column headerText="Title">
+						<p:commandLink value="#{naLabShipment.title}"
+							action="naLabShipmentForm" onstart="naLabBlock.show();">
+							<f:setPropertyActionListener
+								target="#{naLabShipmentForm.shipment}" value="#{naLabShipment}" />
+						</p:commandLink>
+					</p:column>
+
+					<p:column headerText="Date">
+						<h:outputText value="#{naLabShipment.creationDate}">
+							<f:convertDateTime />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Collection Site">
+						<h:outputText value="#{naLabShipment.collectionSite.name}" />
+					</p:column>
+
+					<p:column headerText="External Shipping ID">
+						<h:outputText value="#{naLabShipment.externalShippingId}" />
+					</p:column>
+
+					<p:column headerText="External Collaborator">
+						<h:outputText value="#{naLabShipment.externalCollaborator}" />
+					</p:column>
+				</p:dataTable>
+			</p:scrollPanel>
+		</h:form>
+
+		<p:blockUI block="specimenForm" widgetVar="shipmentBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+
+		<p:blockUI block="naLabForm" widgetVar="naLabBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+
+	</ui:define>
+</ui:composition>

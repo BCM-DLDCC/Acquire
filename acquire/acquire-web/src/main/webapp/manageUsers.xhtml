@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+		<p:breadCrumb>
+			<p:menuitem value="Home" url="./index.jsf" />
+			<p:menuitem value="Manage Users" url="./manageUsers.jsf">
+				<f:param name="cid" value="#{conversation.id}" />
+			</p:menuitem>
+		</p:breadCrumb>
+		<br />
+
+		<p:dataTable id="usersTable" var="user" value="#{allUsers}"
+			paginatorPosition="bottom" paginator="true" rows="25">
+
+			<f:facet name="header">Acquire Users</f:facet>
+
+			<p:column id="firstName" headerText="First Name">
+				<h:outputText value="${user.firstName}" />
+			</p:column>
+
+			<p:column id="lastName" headerText="Last Name">
+				<h:outputText value="${user.lastName}" />
+			</p:column>
+
+			<p:column id="username" headerText="Username">
+				<h:outputText value="${user.identityId}" />
+			</p:column>
+
+			<p:column id="editUser">
+				<h:form>
+					<p:commandButton value="Edit" action="editUser" ajax="false">
+						<f:setPropertyActionListener target="#{userManager.user}"
+							value="#{user}" />
+						<f:setPropertyActionListener
+							target="#{acquirePermissionManager.user}" value="#{user}" />
+					</p:commandButton>
+				</h:form>
+			</p:column>
+
+		</p:dataTable>
+
+		<p:blockUI block="usersTable" trigger="usersTable">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edu.bcm.dldcc.big</groupId>
+	<artifactId>acquire</artifactId>
+	<packaging>pom</packaging>
+	<name>Acquire application</name>
+
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Define the version of JBoss' Java EE 6 APIs we want to import. Any 
+			dependencies from org.jboss.spec will have their version defined by this 
+			BOM -->
+		<javaee6.web.spec.version>2.0.0.Final</javaee6.web.spec.version>
+		<!-- Alternatively, comment out the above line, and un-comment the line 
+			below to use version 3.0.0.Beta1-redhat-1 which is a release certified to 
+			work with JBoss EAP 6. It requires you have access to the JBoss EAP 6 maven 
+			repository. -->
+		<!-- <javaee6.web.spec.version>3.0.0.Beta1-redhat-1</javaee6.web.spec.version> -->
+		<seam.version>3.1.0.Final</seam.version>
+		<acquire.version>2.3.4.Final</acquire.version>
+		<deployment></deployment>
+		<appServer>https://</appServer>
+		<casLoginUrl>https://</casLoginUrl>
+		<casLogoutUrl>https://</casLogoutUrl>
+		<casServer>https://</casServer>
+		<caTissueUrl>https://</caTissueUrl>
+		<fileDbName>mongoDbName</fileDbName>
+		<fileDbHost>url</fileDbHost>
+		<scmid>subversion</scmid>
+    <supportName>name</supportName>
+		<supportAddress>email</supportAddress>
+		<camel.version>2.12.1</camel.version>
+	</properties>
+
+	<repositories>
+		    <repository>
+      <id>NCI</id>
+      <name>NCI Public Repository</name>
+      <url>https://ncimvn.nci.nih.gov/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>Primefaces</id>
+      <name>Primefaces Public Repository</name>
+      <url>http://repository.primefaces.org/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+        <id>BCM-DLDCC-mvn-repo</id>
+        <url>https://raw.github.com/BCM-DLDCC/publicMaven/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+        <releases>
+          <enabled>true</enabled>
+        </releases>
+    </repository>
+
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Define the version of the EJB jar so that we don't need to repeat 
+				ourselves in every module -->
+			<!-- Define the version of the WAR so that we don't need to repeat ourselves 
+				in every module -->
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>acquire-web</artifactId>
+				<version>${project.version}</version>
+				<type>war</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>annotations-persistence</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+
+
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>acquire-utility</artifactId>
+				<version>${project.version}</version>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>catissue-persistence</artifactId>
+				<version>${project.version}</version>
+				<classifier>${deployment}</classifier>
+			</dependency>
+
+			<!-- JBoss distributes a complete set of Java EE 6 APIs including a Bill 
+				of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
+				of artifacts. We use this here so that we always get the correct versions 
+				of artifacts. Here we use the jboss-javaee-web-6.0 stack (you can read this 
+				as the JBoss stack of the Java EE Web Profile 6 APIs) -->
+			<!-- JSR-303 (Bean Validation) Implementation -->
+			<!-- Provides portable constraints such as @Email -->
+			<!-- Hibernate Validator is shipped in JBoss AS 7 -->
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>4.2.0.Final</version>
+				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- Test dependencies -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.10</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.seam</groupId>
+				<artifactId>seam-bom</artifactId>
+				<version>${seam.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.richfaces</groupId>
+				<artifactId>richfaces-bom</artifactId>
+				<version>4.2.0.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>inventory-ejb</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>4.2.2.Final</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>jdom</groupId>
+				<artifactId>jdom</artifactId>
+				<version>1.1</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>acquire-api</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>admin-ejb</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>admin-persistence</artifactId>
+				<version>${project.version}</version>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>query-ejb</artifactId>
+				<version>${project.version}</version>
+				<type>ejb</type>
+				<classifier>${deployment}</classifier>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.spec</groupId>
+				<artifactId>jboss-javaee-6.0</artifactId>
+				<version>${javaee6.web.spec.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-envers</artifactId>
+				<version>4.2.2.Final</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.picketlink.idm</groupId>
+				<artifactId>picketlink-idm-parent</artifactId>
+				<version>1.5.0.Alpha02</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.picketlink.idm</groupId>
+				<artifactId>picketlink-idm-ldap</artifactId>
+				<version>1.5.0.Alpha02</version>
+			</dependency>
+			<dependency>
+				<groupId>org.primefaces</groupId>
+				<artifactId>primefaces</artifactId>
+				<version>3.5</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>dldcc-cas</artifactId>
+				<version>1.3.1.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>dldcc-common</artifactId>
+				<version>1.5.1.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.8</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jasig.cas.client</groupId>
+				<artifactId>cas-client</artifactId>
+				<version>3.2.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-core</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-cdi</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-jpa</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-sjms</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>gov.nih.nci.iso21090</groupId>
+				<artifactId>iso-datatypes</artifactId>
+				<version>2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-mail</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-jms</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>dldcc-iso21090</artifactId>
+				<version>1.1.1.Final</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-jpamodelgen</artifactId>
+				<version>1.3.0.Final</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>edu.bcm.dldcc.big</groupId>
+				<artifactId>dldcc-fileManagement</artifactId>
+				<version>1.0.1.Final</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- Compiler plugin enforces Java 1.6 compatibility and activates annotation 
+					processors -->
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3.2</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+						<debug>true</debug>
+						<debuglevel>lines,vars,source</debuglevel>
+						<compilerArgument>-proc:none</compilerArgument>
+					</configuration>
+				</plugin>
+				<!-- The JBoss AS plugin deploys your ear to a local JBoss AS container -->
+				<!-- Due to Maven's lack of intelligence with EARs we need to configure 
+					the jboss-as maven plugin to skip deployment for all modules. We then enable 
+					it specifically in the ear module. -->
+				<plugin>
+					<groupId>org.jboss.as.plugins</groupId>
+					<artifactId>jboss-as-maven-plugin</artifactId>
+					<version>7.1.0.Beta1b</version>
+					<inherited>true</inherited>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>2.9</version>
+					<configuration>
+						<projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+						<wtpmanifest>true</wtpmanifest>
+						<wtpapplicationxml>true</wtpapplicationxml>
+						<wtpversion>2.0</wtpversion>
+						<manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.3.2</version>
+					<configuration>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.0.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.3</version>
+				</plugin>
+				<plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.5</version>
+        </plugin>
+
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      org.codehaus.mojo
+                    </groupId>
+                    <artifactId>
+                      build-helper-maven-plugin
+                    </artifactId>
+                    <versionRange>
+                      [1.5,)
+                    </versionRange>
+                    <goals>
+                      <goal>add-source</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+
+			</plugins>
+		</pluginManagement>
+		
+		<plugins>
+
+      <!-- Compiler plugin enforces Java 1.6 compatibility and controls execution 
+        of annotation processors -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>run-annotation-processors-only</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <compilerArgument>-proc:only</compilerArgument>
+              <!-- If your app has multiple packages, use this include filter to 
+                execute the processor only on the package containing your entities -->
+                <includes>
+                <include>**/model/*.java</include>
+                <include>**/entity/*.java</include>
+                <include>**/domain/*.java</include>
+                <include>**/domain/**/*.java</include>
+              </includes> 
+            </configuration>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Build helper plugin adds the sources generated by the JPA 2 annotation 
+        processor to the compile path -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/annotations</source>
+              </sources>
+            </configuration>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+		
+
+	</build>
+
+	<modules>
+		<module>acquire-ear</module>
+		<module>acquire-utility</module>
+		<module>acquire-web</module>
+
+		<module>catissue-persistence</module>
+		<module>annotations-persistence</module>
+
+
+		<module>inventory-ejb</module>
+		<module>acquire-api</module>
+		<module>admin-ejb</module>
+		<module>admin-persistence</module>
+		<module>query-ejb</module>
+	</modules>
+
+		<version>2.3.4.Final</version>
+</project>

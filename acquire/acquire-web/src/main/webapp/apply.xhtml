@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces"
+	xmlns:o="http://omnifaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<f:viewParam name="id" value="#{applicationManager.applicationId}" />
+			<s:viewAction action="#{applicationManager.initApplication}" />
+		</f:metadata>
+	</ui:define>
+	
+	<script type="text/javascript">
+	/*$("#commentsPanel").focusout(function(){
+	    $("#commentsPanel").focus();
+	});*/
+	function focusOnComments(){
+        //$(PrimeFaces.escapeClientId('mainForm:commentsPanel')).focus();
+        $(PrimeFaces.focus('commentsForm:commentsPanel');
+    }
+	</script>
+
+	<ui:define name="body">
+		<f:loadBundle basename="acquireMessages" var="msg" />
+		<h:outputStylesheet name="css/apollo.css" />
+		<p:breadCrumb>
+			<p:menuitem url="./index.jsf" value="Home" />
+			<p:menuitem url="./index.jsf?tab=3" value="Inbox"
+				rendered="#{authorizations.isRac(currentProgram)}" />
+			<p:menuitem url="./userApplications.jsf" value="My Applications"
+				rendered="#{authorizations.isPublicUser()}" />
+		</p:breadCrumb>
+		<br/>
+		<p:outputPanel id="mainPanel">
+		<h:form id="mainForm">
+
+			<ui:param name="application"
+				value="#{applicationManager.application}" />
+
+			<ui:param name="user"
+				value="#{applicationManager.application.investigator}" />
+
+			<ui:param name="project"
+				value="#{applicationManager.application.project}" />
+
+			<ui:param name="comments"
+				value="#{applicationManager.application.comments}" />
+
+			<ui:param name="request"
+				value="#{applicationManager.application.materialRequests}" />
+
+			<ui:param name="edit"
+				value="#{applicationManager.isApplicationEditable}" />
+
+			<p:growl id="messages" globalOnly="true"/>
+
+			<h1>#{msg['rac.apply.title']}</h1>
+
+			<p:panelGrid columns="1">
+
+				<p:panel style="float: right; border: none;">
+					<p:outputLabel for="statusMenu" value="#{msg['rac.apply.status']}" />
+					<p:selectOneMenu id="statusMenu"
+						value="#{application.applicationStatus}"
+						rendered="#{authorizations.isRacChair(currentProgram) and application.applicationStatus ne 'DRAFT'}"
+						style="top: 6px;"
+						validator="#{applicationManager.validateApplicationStatus}">
+						<f:selectItems value="#{applicationStatusChoices}" var="status"
+							itemLabel="#{status}" itemValue="#{status}" />
+					</p:selectOneMenu>
+					<h:outputText value = ": #{application.applicationStatus.toString()}"
+					 rendered = "#{!authorizations.isRacChair(currentProgram) or application.applicationStatus eq 'DRAFT'}"/>
+					<p:message for=":mainForm:statusMenu" />
+				</p:panel>
+
+<p>The following application for specimen is divided into 4 Sections: Principle Investigator Information, Project Information, Material Request Information and a Certification.  Each section may be 
+collapsed or expanded by clicking on the arrow to the left of the title. The form can be saved without submitting for future editing but the <strong>Project Title</strong> must be entered before
+ saving your work. When ready for submittal, please verify that you have completed all fields marked with a dagger in each section of the application form before submitting to the RAC committee.</p>
+
+				<p:accordionPanel multiple="true" activeIndex="0,1,2,3"
+					 id="applyAccordian">
+					<p:tab title="#{msg['rac.apply.accord.header.investigator']}">
+						<ui:include src="/apply_pi.xhtml">
+
+							<ui:param name="user" value="#{user}" />
+							<ui:param name="edit" value="#{edit}" />
+						</ui:include>
+					</p:tab>
+					<p:tab title="#{msg['rac.apply.accord.header.profile']}">
+						<ui:include src="/apply_project.xhtml">
+
+							<ui:param name="project" value="#{project}" />
+							<ui:param name="edit" value="#{edit}" />
+						</ui:include>
+
+					</p:tab>
+					<p:tab title="#{msg['rac.apply.accord.header.materials']}">
+						<ui:include src="/apply_materials.xhtml">
+
+							<ui:param name="request" value="#{request}" />
+							<ui:param name="edit" value="#{edit}" />
+						</ui:include>
+
+					</p:tab>
+					<p:tab title="#{msg['rac.apply.accord.header.certification']}">
+						<f:param name="cid" value="#{conversation.id}" />
+						<ui:include src="/apply_certification.xhtml">
+							<ui:param name="edit" value="#{edit}" />
+						</ui:include>
+					</p:tab>
+				</p:accordionPanel>
+
+			</p:panelGrid>
+			<p:outputPanel id="viewDocPanel">
+			<p:commandButton action="#{applicationManager.saveApplication}"
+				value="#{application.applicationStatus eq 'DRAFT' ? 'Save and Edit Later' : 'Save Changes'}"
+				onstart="applyBlock.show();" onsuccess="applyBlock.hide();"
+				disabled="#{not edit and !authorizations.isRacChair(currentProgram)}" 
+				update=":mainPanel, :blockPanel"/>
+			<p:commandButton id="uploadButton" icon="ui-icon-document"
+				value="Add Documents" oncomplete="uploadDlg.show();"
+				update=":uploadForm" 
+				disabled="#{not edit}"
+				process="@this"/>
+			<p:commandButton value="View Documents" id="docsButton"
+				rendered="#{not empty application.supportingDocuments}" />
+			<p:overlayPanel for="docsButton" dynamic="false">
+
+				<p:dataTable value="#{application.supportingDocuments.toArray()}"
+					var="document" id="docPanel">
+					<p:column headerText="View File">
+						<p:commandButton id="reportDownloadButton"
+							value="#{document.fileName}" ajax="false"
+							onclick="PrimeFaces.monitorDownload(start, stop)"
+							icon="ui-icon-arrowthick-1-s" style="float: left">
+							<p:fileDownload value="#{files.downloadFile(document)}" />
+						</p:commandButton>
+					</p:column>
+					<p:column headerText="Delete File">
+						<p:commandButton id="reportRemoveButton" icon="ui-icon-trash"
+							action="#{applicationManager.removeSupportingDocument(document)}"
+							update="docPanel" disabled="#{not edit}" 
+							process="@this"/>
+					</p:column>
+				</p:dataTable>
+
+			</p:overlayPanel>
+			<p:commandButton action="#{applicationManager.submitApplication}"
+				value="Submit"
+				rendered="#{application.applicationStatus eq 'DRAFT'}"
+				onclick="prepareSubmit();"
+				onstart="applyBlock.show();" onsuccess="applyBlock.hide();"
+				update=":mainPanel, :blockPanel" oncomplete="postSubmit();"
+				/>
+				
+				<p:panel id="voteButtons" header="Vote" rendered="#{application.reviewers[currentUser] ne null}">
+				<p:panelGrid rendered="#{application.reviewers[currentUser] ne null}">
+				  <p:row>
+				  
+				    <p:column>
+				      <h:outputText 
+				      value="Your current vote is: #{application.reviewers[currentUser].vote.toString()}" 
+				      rendered="#{application.reviewers[currentUser].vote ne 'NOT_VOTED'}"/>
+				    </p:column>
+				    <p:column>
+				      <p:commandButton value="Vote Yes"
+				      action="#{applicationManager.processVote(currentUser)}"
+				      process="@this" update="voteButtons, messages"
+				      rendered="#{application.reviewers[currentUser].vote ne 'YES'}" >
+				      <f:setPropertyActionListener value="#{'YES'}" 
+				      target="#{applicationManager.vote}" />
+				      </p:commandButton>
+				    </p:column>
+				    <p:column>
+              <p:commandButton value="Vote No"
+              action="#{applicationManager.processVote(currentUser)}"
+              process="@this" update="voteButtons, messages"
+              rendered="#{application.reviewers[currentUser].vote ne 'NO'}" >
+              <f:setPropertyActionListener value="#{'NO'}" 
+              target="#{applicationManager.vote}" />
+              </p:commandButton>
+            </p:column>
+            <p:column>
+              <p:commandButton value="Cancel Vote"
+              action="#{applicationManager.processVote(currentUser)}"
+              process="@this" update="voteButtons, messages"
+              rendered="#{application.reviewers[currentUser].vote ne 'NOT_VOTED'}" >
+              <f:setPropertyActionListener value="#{'NOT_VOTED'}" 
+              target="#{applicationManager.vote}" />
+              </p:commandButton>
+            </p:column>
+				  </p:row>
+				</p:panelGrid>
+				</p:panel>
+				</p:outputPanel>
+			
+			<p:remoteCommand name="prepareSubmit" immediate="true">
+			 <f:setPropertyActionListener value="#{true}"
+          target="#{applicationManager.submitting}" />
+			</p:remoteCommand>
+			
+			<p:remoteCommand name="postSubmit" immediate="true">
+			<f:setPropertyActionListener value="#{false}"
+          target="#{applicationManager.submitting}" />
+			</p:remoteCommand>
+
+			<div style="clear: both" />
+			<p>
+			 * Required for Saving Applications. <br />
+			 &#x2020; for Submitting Applications.
+			</p>
+
+		</h:form>
+		</p:outputPanel>
+		<h:form id="commentsForm">
+			<div style="clear: both" />
+			<hr></hr>
+			<p:growl id="commentsMessages" />
+			<h:panelGroup rendered="#{authorizations.isRac(currentProgram) and application.applicationStatus ne 'DRAFT'}">
+				<p:panel>
+					<f:facet name="header">#{msg['rac.apply.accord.header.comments']}</f:facet>
+					<ui:include src="/apply_comments.xhtml">
+						<ui:param name="comments" value="#{comments}" />
+					</ui:include>
+				</p:panel>
+			</h:panelGroup>
+		</h:form>
+		<div style="clear:both;"/>
+		
+		<p:dialog header="Upload Document" resizable="false"
+			widgetVar="uploadDlg" modal="true" id="uploadDialog">
+			<h:form id="uploadForm">
+				<p:outputPanel id="uploadPanel">
+					<p:fileUpload id="reportUpload"
+						fileUploadListener="#{applicationManager.addSupportingDocument}"
+						oncomplete="uploadDlg.hide();" advanced="true" multiple="true"
+						update=":mainForm:viewDocPanel" />
+				</p:outputPanel>
+			</h:form>
+		</p:dialog>
+
+<p:outputPanel id="blockPanel">
+		<p:blockUI block="mainForm" widgetVar="applyBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+		<p:blockUI block="commentsForm"  widgetVar="commentsBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+		</p:outputPanel>
+	</ui:define>
+</ui:composition>

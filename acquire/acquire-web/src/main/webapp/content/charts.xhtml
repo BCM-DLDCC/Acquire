@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h1>Graphical Reporting</h1>
+
+	<p:accordionPanel activeIndex = "0">
+
+		<p:tab title="by Collection Site">
+			<p:barChart value="#{collectionSiteChart.categoryModel}" showDatatip = "true" datatipFormat = "%2\$d"
+				legendPosition="ne" title="Samples by Collection Site" extender="chartTweak"/>
+		</p:tab>
+
+		<p:tab title="by Disease Type">
+			<p:pieChart value="#{diseaseChart.diseaseModel}" legendPosition="ne" 
+				title="Samples by Disease Type" showDataLabels="true" style = "height: 600px;" extender="chartTweak"/>
+		</p:tab>
+
+		<p:tab title="by Timepoint">
+			<p:lineChart value="#{timepointChart.model}" legendPosition="ne" showDatatip = "true" datatipFormat = "%2\$d"
+				title="Samples Over Time" showDataLabels="true" extender = "chartTweak"/>
+		</p:tab>
+
+
+	</p:accordionPanel>
+
+</ui:composition>

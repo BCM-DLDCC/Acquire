@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+		<f:loadBundle basename="acquireMessages" var="msg" />
+
+		<script type="text/javascript">
+		function start() {
+		    statusDialog.show();
+		}
+		
+		function stop() {
+		    statusDialog.hide();
+		}
+        </script>
+
+		<h:panelGroup layout="block" id="resultsDiv">
+			<p:panel>
+				<h1>Results</h1>
+
+
+				
+				<h:form id="resultForm">
+
+					<p:panel id="resultsStep2Panel"
+						header="#{msg['miner.search.step2']}" toggleSpeed="500"
+						toggleable="true" collapsed="false">
+						
+						<p:panelGrid id="publicResultControlGrid" columns="2"
+						cellspacing="4" cellpadding="4" styleClass="minerBorder"
+						rendered="#{authorizations.isPublicUser}">
+							<h:outputText value="#{msg['miner.search.result']}" />
+							<h:panelGroup>
+								<h:outputText escape="false"
+									rendered="#{searchManager.queryCount gt 0}"
+									value="#{msg['miner.search.result.yes']}" />
+								<h:outputText escape="false"
+									rendered="#{searchManager.queryCount eq 0}"
+									value="#{msg['miner.search.result.no']}" />
+							</h:panelGroup>
+						</p:panelGrid>
+						<h:panelGrid rendered="#{not authorizations.isPublicUser}"
+							columns="1" cellspacing="4" cellpadding="4"
+							styleClass="minerBorder">
+							<p:column>
+								<h:outputText id="qC" value="#{searchManager.queryCount} " />
+								<h:outputText value="#{msg['miner.search.step2.count']}" />
+							</p:column>
+						</h:panelGrid>
+						<br />
+						<br />
+						<p:panelGrid id="searchParamGrid" columns="2" cellspacing="4"
+							cellpadding="4" styleClass="minerBorder">
+							<p:column>
+								<h:outputText value="#{msg['miner.search.step2.criteria']}" />
+							</p:column>
+							<p:column>
+								<div style="float: left;">
+									<h:outputText value="#{searchManager.terms}" />
+								</div>
+							</p:column>
+						</p:panelGrid>
+
+						<p:panelGrid id="countGrid" columns="2" cellspacing="4"
+							cellpadding="4" styleClass="minerBorder">
+
+							<h:panelGroup rendered="#{not authorizations.isPublicUser}">
+								<p:column>
+									<p:commandButton
+										value="#{msg['miner.search.step2.change.criteria']}"
+										onstart="resultsBlock.show();" onsuccess="resultsBlock.hide();"
+										action="miner" ajax="true" />
+								</p:column>
+								<p:column>
+									<p:commandButton
+										value="#{msg['miner.search.step2.new.search']}"
+										onstart="resultsBlock.show();" onsuccess="resultsBlock.hide();"
+										action="#{searchManager.reset}" ajax="true" />
+								</p:column>
+							</h:panelGroup>
+
+							<h:panelGroup rendered="#{authorizations.isPublicUser}">
+								<p:row>
+									<p:column></p:column>
+									<p:column>
+										<h:panelGrid id="publicActionGrid" columns="3" cellspacing="4"
+											cellpadding="4" styleClass="minerBorder">
+											<p:column>
+												<p:commandButton
+													value="#{msg['miner.search.step2.change.criteria']}"
+													action="miner" ajax="true" onstart="resultBlock.show();"
+													onsuccess="resultBlock.hide()" />
+											</p:column>
+											<p:column>
+												<p:commandButton
+													value="#{msg['miner.search.step2.new.search']}"
+													action="#{searchManager.reset}"
+													onstart="resultBlock.show();"
+													oncomplete="resultBlock.hide();" ajax="true" />
+											</p:column>
+											<p:column>
+												<p:commandButton
+													value="#{msg['miner.search.step2.rac.save']}"
+													action="#{applicationManager.initApplication}"
+													onstart="resultBlock.show();"
+													oncomplete="resultBlock.hide();" />
+											</p:column>
+										</h:panelGrid>
+									</p:column>
+								</p:row>
+							</h:panelGroup>
+						</p:panelGrid>
+
+						
+
+					</p:panel>
+				</h:form>
+
+				<br />
+				<br />
+				<h:form id="dataForm">
+
+
+					<p:panelGrid id="resultControlGrid" columns="3" cellspacing="4"
+						cellpadding="4" styleClass="minerBorder"
+						rendered="#{!authorizations.isPublicUser}">
+						<p:column>
+							<h:panelGroup id="resultOptions">
+								<h:outputText
+									value="#{msg['miner.search.setp3.results.options']}" />
+								<p:button outcome="minerResult" icon="ui-icon-help"
+									disabled="true" />
+
+								<p:tooltip for="resultOptions"
+									value="#{msg['miner.search.step3.display.options']}"
+									showEffect="fade" hideEffect="fade" />
+
+							</h:panelGroup>
+						</p:column>
+						<p:column>
+							<h:panelGroup id="resultInline">
+								<p:commandButton id="btnQuery"
+									value="#{msg['miner.search.step3.display.table']}"
+									disabled="#{searchManager.queryCount gt maxUiResults}"
+									update="dataTable" onstart="dataBlock.show();"
+									oncomplete="dataBlock.hide();"
+									actionListener="#{searchManager.runQuery}" ajax="false">
+									<f:setPropertyActionListener value="#{true}"
+										target="#{requestScope.showResultTable}" />
+								</p:commandButton>
+								<p:button id="resultInlineMsg"
+									rendered="#{searchManager.queryCount gt maxUiResults }"
+									outcome="minerResult" icon="ui-icon-notice" disabled="true" />
+
+								<p:tooltip for="resultInline"
+									value="#{msg['miner.search.step3.display.inline.disabled']}"
+									showEffect="fade" hideEffect="fade" 
+									rendered="#{searchManager.queryCount gt maxUiResults}"/>
+							</h:panelGroup>
+						</p:column>
+						<p:column>
+
+							<p:commandButton id="btnExcel"
+								value="#{msg['miner.search.step3.display.export']}" ajax="false"
+								onclick="PrimeFaces.monitorDownload(start, stop)"
+								icon="ui-icon-arrowthick-1-s">
+								<p:fileDownload value="#{minerExcelExporter.file}" />
+							</p:commandButton>
+
+						</p:column>
+					</p:panelGrid>
+
+					
+
+					<p:scrollPanel mode="native">
+						<p:dataTable id="dataTable" paginatorPosition="bottom"
+							paginator="true" rows="10" widgetVar="minerTable"
+							styleClass="report" var="_searchResult"
+							currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							emptyMessage="Results will appear once you choose to display the results"
+							value="#{searchManager.queryResult}"
+							rendered="#{!authorizations.isPublicUser}">
+							<f:facet name="header">#{msg['miner.search.step3.results']}</f:facet>
+
+							<p:columns value="#{minerResultColumn.columns}" var="column"
+								columnIndexVar="colIndex" filterMatchMode="contains"
+								sortBy="#{_searchResult[column.property]}"
+								filterBy="#{_searchResult[column.property]}" width="150">
+								<f:facet name="header">#{column.header}</f:facet>  
+				  			#{_searchResult[column.property]}
+				        </p:columns>
+
+						</p:dataTable>
+					</p:scrollPanel>
+				</h:form>
+				
+				
+			</p:panel>
+		</h:panelGroup>
+
+
+		<p:blockUI block="resultForm" widgetVar="resultsBlock">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+	</ui:define>
+</ui:composition>

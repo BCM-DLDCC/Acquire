@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+		<ui:param name="user" value="${userManager.user}" />
+
+		<p:breadCrumb>
+			<p:menuitem value="Home" url="./index.jsf" />
+			<p:menuitem value="Manage Users" url="./manageUsers.jsf" />
+			<p:menuitem value="Edit User" url="#" />
+		</p:breadCrumb>
+		<br />
+
+		<h3 style="padding-left: 10px;">${user.identityId}</h3>
+
+		<p:tabView id="userData">
+
+			<p:tab id="userInfo" title="Account Information">
+
+				<h:form id="userInformationForm">
+					<p:panelGrid columns="2">
+
+						<h:outputText value="Account Name" style="font-weight:bold;" />
+						<h:outputText value="#{user.identityId}" style="font-weight:bold;" />
+						<h:outputText value="First Name" />
+						<h:outputText value="#{user.firstName}" />
+						<h:outputText value="Last Name" />
+						<h:outputText value="#{user.lastName}" />
+						<h:outputText value="Institution" />
+						<h:outputText value="#{user.institution}" />
+						<h:outputText value="Affiliation" rendered="#{user.tcrb}" />
+						<h:outputText value="#{user.affiliation}" rendered="#{user.tcrb}" />
+						<h:outputText value="caTissue User" />
+						<p:selectBooleanCheckbox value="#{user.caTissueUser}"
+							disabled="true" />
+							<h:outputText value="BCM User" />
+							<p:selectBooleanCheckbox value="#{user.bcmUser}" disabled="true" />
+							<p:outputLabel for="enabledCheck" value="Enabled" />
+							<p:selectBooleanCheckbox value="#{user.enabled}"
+								id="enabledCheck" 
+								disabled="#{user.caTissueUser or not authorizations.isSuperAdmin}" >
+									<p:ajax listener="#{userManager.saveUser}" />
+									</p:selectBooleanCheckbox>
+						<h:outputText value="Address:" />
+						<p:spacer />
+						<h:outputText value="Street" />
+						<h:outputText value="#{user.address.street1}" />
+						<h:outputText value="City" />
+						<h:outputText value="#{user.address.city}" />
+						<h:outputText value="State" />
+						<h:outputText value="#{user.address.state}" />
+						<h:outputText value="ZIP" />
+						<h:outputText value="#{user.address.zip}" />
+					</p:panelGrid>
+				</h:form>
+			</p:tab>
+
+			<p:tab id="userPermissions" title="Permissions">
+
+				<p>Changes made to permissions take place immediately and do not
+					require saving or submitting to be recorded.</p>
+
+
+				<h:form id="userProgramForm">
+					<p:outputLabel for="superAdmin" value="Super Admin"
+						rendered="#{authorizations.isSuperAdmin}"
+						style="padding-right: 10px;" />
+					<p:selectBooleanCheckbox id="superAdmin" value="#{user.superAdmin}"
+						rendered="#{authorizations.isSuperAdmin}" style="margin-top:5px;">
+						<p:ajax listener="#{userManager.saveUser}" update="@this"/>
+					</p:selectBooleanCheckbox>
+					<br />
+					<br />
+
+					<p:selectOneMenu value="#{acquirePermissionManager.program}"
+						id="programs" effectDuration="100" style="width: 188px">
+						<f:selectItem itemLabel="Select Program" itemValue="" />
+						<f:selectItems value="#{acquirePermissionManager.allPrograms}" />
+					</p:selectOneMenu>
+
+					<p:commandButton value="Go"
+						action="#{acquirePermissionManager.getProgramSites}"
+						styleClass="userManageButton" id="userSiteButton"
+						update=":userData:programInfo" />
+				</h:form>
+				<br />
+
+				<h:panelGroup id="programInfo">
+
+					<p:panel rendered="#{acquirePermissionManager.program != null}">
+
+
+						<h:form id="userTabForm">
+							<h2>
+								#{acquirePermissionManager.program}
+								<h:outputText styleClass="ui-icon ui-icon-info" id="programTip"
+									style="float: left;" />
+								<p:tooltip for="programTip">
+						Toggling Public Data restricts the users view to only the limited green data elements. To enable the user to see all appropriate data elements do NOT toggle Public Data.
+						</p:tooltip>
+							</h2>
+							<p:selectOneRadio id="programRole" layout="pageDirection"
+								value="#{acquirePermissionManager.programRole}">
+								<f:selectItems
+									value="#{acquirePermissionManager.getProgramRoleChoices}" />
+								<p:ajax listener="#{acquirePermissionManager.addProgramRole}" />
+							</p:selectOneRadio>
+							<h3>
+								Tab Access
+								<h:outputText styleClass="ui-icon ui-icon-info" id="tabTip"
+									style="float: left;" />
+								<p:tooltip for="tabTip">
+						Checking the boxes next to the Tab Access enables the associated tab to appear on the Homepage when the user logs into Acquire.
+						</p:tooltip>
+							</h3>
+							<p:selectManyCheckbox
+								value="#{acquirePermissionManager.functions}"
+								layout="pageDirection">
+								<f:selectItems
+									value="#{acquirePermissionManager.getFunctionChoices}" />
+								<p:ajax listener="#{acquirePermissionManager.updateFunctions}" />
+							</p:selectManyCheckbox>
+						</h:form>
+						<hr />
+
+						<h:form id="userSiteForm">
+							<p:selectOneMenu id="sites"
+								value="#{acquirePermissionManager.site}" effectDuration="100"
+								style="width: 188px;">
+								<f:selectItem itemLabel="Select Site" itemValue="" />
+								<f:selectItems
+									value="#{acquirePermissionManager.getProgramSites}" />
+							</p:selectOneMenu>
+
+							<h:outputText styleClass="ui-icon ui-icon-info"
+								style="float: left;" id="siteTip" />
+							<p:tooltip for="siteTip">
+						Select a site to limit the users view to the site for which they have permissions. More than one site can be added to a users account.
+						</p:tooltip>
+
+
+							<p:commandButton value="Go" styleClass="userManageButton"
+								id="userManageButton" update=":userData:userSites" />
+
+						</h:form>
+
+
+						<h:panelGroup id="userSites">
+							<h:form id="userRoleForm">
+								<h3>Data Access Level</h3>
+${acquirePermissionManager.site}
+									<p:selectOneRadio id="roles" layout="pageDirection"
+									value="#{acquirePermissionManager.role}">
+									<f:selectItems
+										value="#{acquirePermissionManager.getRoleChoices}"
+										noSelectionValue='""' />
+									<p:ajax listener="#{acquirePermissionManager.addRole}" />
+								</p:selectOneRadio>
+							</h:form>
+						</h:panelGroup>
+					</p:panel>
+
+				</h:panelGroup>
+
+			</p:tab>
+
+			<p:tab id="changePassword" title="Change Password"
+			 rendered="#{!user.caTissueUser and authorizations.isSuperAdmin}">
+
+				
+					<h:form id="changePasswordForm">
+					<p:growl id="messages" />
+					<p:panelGrid columns="2">
+						<p:outputLabel for="passwordInput" value="New Password" />
+						<p:password id="passwordInput" value="#{userManager.newPassword}" />
+						<p:commandButton value="Change Password"
+							action="#{userManager.adminChangePassword}" 
+							update="messages"/>
+							</p:panelGrid>
+					</h:form>
+			
+
+
+			</p:tab>
+		</p:tabView>
+
+	</ui:define>
+
+</ui:composition>

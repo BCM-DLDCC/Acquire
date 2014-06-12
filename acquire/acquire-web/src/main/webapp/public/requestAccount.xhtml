@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:p="http://primefaces.org/ui"
+  xmlns:a4j="http://richfaces.org/a4j"
+  xmlns:s="http://jboss.org/seam/faces"
+  xmlns:sf="http://java.sun.com/jsf/composite/components/seamfaces"
+  template="../templates/template.xhtml">
+
+<ui:define name="metadata">
+  <f:metadata>
+    <s:viewAction action="#{userManager.requestAccount}" />
+  </f:metadata>
+  
+</ui:define>
+
+  <ui:define name="body">
+  <f:loadBundle basename="acquireMessages" var="msg" />
+<h:outputScript library = "js" name="acquireGeneral.js"/>
+<p:breadCrumb rendered="#{identity.loggedIn}">
+  <p:menuitem url="./index.jsf" value="Home"/>
+  <p:menuitem url="./reviewUsers.jsf" value="Review Users">
+    <f:param name="cid" value="#{conversation.id}" />
+  </p:menuitem>
+</p:breadCrumb>
+   <h1>Request Account</h1>
+   
+   <ui:param name="user" value="${userManager.user}" />
+<h:form id="request" >
+
+<p:growl id="message" globalOnly="true"/>
+
+ <p:panelGrid columns="1">
+  <h:outputText 
+  value="You do not have an account with Acquire, or your account is not active"
+   rendered="#{param['loginFailed'] ne null}" styleClass="required"/>
+  <h:outputText
+  value="#{msg['accountRequest.notice']}"
+  rendered="#{not identity.loggedIn}"/>
+	 <h:panelGroup>
+	 <h:panelGroup>
+		 <p:outputLabel value="First Name" for="firstNameInput"/>
+		 <p:inputText id="firstNameInput" value="#{user.firstName}"
+		 required="true" />
+		 <p:message for=":request:firstNameInput" />
+		 </h:panelGroup>
+ 
+ <h:panelGroup>
+		 <p:outputLabel value="Last Name" for="lastNameInput" />
+		 <p:inputText id="lastNameInput" value="#{user.lastName}"
+		 required="true"/>
+		 <p:message for=":request:lastNameInput" />
+		 </h:panelGroup>
+	 </h:panelGroup>
+ 
+	 <h:panelGroup>
+		 <p:outputLabel value="Address: Street" for="streetInput" />
+		 <p:inputText id="streetInput" value="#{user.address.street1}" size="50"/>
+		 <p:message for=":request:streetInput" />
+	 </h:panelGroup>
+ 
+	 <h:panelGroup>
+		 <p:outputLabel value="City:" for="cityInput"/>
+		 <p:inputText id="cityInput" value="#{user.address.city}"/>
+		 <p:outputLabel value="State:" for="stateDropdown"/>
+		 <p:selectOneMenu value="#{user.address.state}" 
+		 style="width: 50px; top: 6px; border-collapse: collapse;"
+		  id="stateDropdown">
+		  <f:selectItems value="#{usStates}" var="state"
+				itemLabel="#{state}" itemValue="#{state}"
+				itemDescription="#{state.fullName}"/>
+		 </p:selectOneMenu>
+		 <p:outputLabel value="Zip:" for="zipInput"/>
+		 <p:inputText value="#{user.address.zip}" id="zipInput" size="15"/>
+	 </h:panelGroup>
+ 
+	 <h:panelGroup>
+		 <p:outputLabel value="Institution:" for="institutionInput"/>
+		 <p:inputText value="#{user.institution}" size="40" id="institutionInput"/>
+	 </h:panelGroup>
+	 
+	 <h:panelGroup>
+	   <p:outputLabel value="BCM User?" for="bcmInput" />
+	   <p:selectBooleanCheckbox value="#{user.bcmUser}" id="bcmInput" />
+	 </h:panelGroup>
+	 
+	 <h:panelGroup id="affiliationPanel">
+	   <p:outputLabel value="Affiliated with TCRB?" for="affiliationCheck"/>
+	   <p:selectBooleanCheckbox value="#{user.tcrb}" 
+	   id="affiliationCheck">
+	     <p:ajax event="change" update="affiliationNamePanel" 
+	     onstart="requestBlock.show();" oncomplete="requestBlock.hide();"/>
+	      
+	  </p:selectBooleanCheckbox>
+	  <a4j:outputPanel id="affiliationNamePanel">
+	   <h:panelGroup rendered="#{user.tcrb}">
+	     <p:outputLabel value="Affiliation:" for="affiliationInput"/>
+	     <p:inputText value="#{user.affiliation}" size="35" 
+	     id="affiliationInput"/>
+	   </h:panelGroup>
+	   </a4j:outputPanel>
+	 </h:panelGroup>
+	 
+	 <h:panelGroup>
+	   <p:outputLabel value="Email Address" for="emailInput"/>
+	   <p:inputText value="#{user.email.value}" size="25" 
+	   required="true" id="emailInput"/>
+	   <p:message for="emailInput" />
+	 </h:panelGroup>
+	 
+	 <h:panelGroup>
+     <p:outputLabel value="Phone Number:" for="phoneInput"/>
+     <p:inputText value="#{user.phone.value}" size="20" 
+     id="phoneInput"/>
+   </h:panelGroup>
+	 
+ </p:panelGrid>
+ 
+ <p:commandButton value="Submit" action="#{userManager.saveUser}" 
+ update="@(form)" onstart="requestBlock.show();" 
+ oncomplete="requestBlock.hide();"
+ rendered="#{not identity.loggedIn}"/>
+ 
+ 
+</h:form>
+<p:blockUI block="request" widgetVar="requestBlock">
+      <h:graphicImage library="img" name="ajax-loader.gif" />
+    </p:blockUI>
+<span class="required">* Data elements with an asterisk must contain data prior to submitting.</span>
+  </ui:define>
+
+</ui:composition>

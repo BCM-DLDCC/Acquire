@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="./templates/template.xhtml">
+
+	<ui:define name="body">
+
+		<h:form>
+			<h:messages id="message" />
+
+			<p:commandButton value="Clean Disease Sites"
+				action="#{migrator.cleanNullSites}" update="message" />
+
+			<p:commandButton value="Restore Parent Specimens"
+				action="#{migrator.restoreParentSpecimen}" update="message" />
+
+			<p:commandButton value="Update Shipped Status"
+				action="#{migrator.migrateShippedStatus}" update="message" />
+				
+		  <p:commandButton value="Start NA Lab report run" 
+		    action="#{migrator.startNaLabReport}" update="message" />
+		    
+		    <p:commandButton value="Test Annotation Update Message"
+		    action="#{migrator.testScoreboardMessage}" update="message" />
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

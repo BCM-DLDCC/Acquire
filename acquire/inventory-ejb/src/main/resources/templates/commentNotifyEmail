@@ -1,0 +1,15 @@
+<html>
+<body>
+<p>
+The following comment has been made:
+</p>
+
+<p>
+${comment}
+</p>
+<p>
+To review the application, or to respond, use the link below:
+</p>
+<a href="${link}">${link}</a>
+</body>
+</html> 

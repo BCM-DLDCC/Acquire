@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:s="http://jboss.org/seam/faces">
+
+<ui:composition template="../templates/template.xhtml">
+	<ui:define name="metadata">
+	    <f:metadata>
+	     <f:viewParam name="username" value="#{voteManager.reviewer}" />
+	     <f:viewParam name="applicationId" value="#{voteManager.applicationId}" />
+	     <f:viewParam name="vote" value="#{voteManager.vote}" />
+	   <ui:remove> <f:viewParam name="expire" value="#{voteManager.expiration}" >
+	       <f:convertDateTime />
+	     </f:viewParam>
+	     </ui:remove> 
+	     <s:viewAction action="#{voteManager.processVote}" />
+	    </f:metadata>
+	</ui:define>
+	<ui:define name="body">
+	<h:form id="voteForm">
+	<p:growl id="messages" />
+	<ui:param name="reviewer" value="#{voteManager.reviewerInfo}" />
+	<ui:param name="application" value="#{voteManager.application}" />
+	<p:panelGrid columns="1">
+	   <h:outputText value="Congratulations, #{reviewer.fullName}!" />
+	   <h:outputText 
+	   value="You have successfully voted on #{application.project.projectTitle}" />
+	   <h:outputText 
+	   value="Your recorded vote is #{application.reviewers[reviewer].vote.toString()}." />
+	   <h:panelGroup>
+	   If this is not correct, you may 
+	   <p:commandButton action="#{voteManager.cancelVote}" value="Cancel"
+	     update="messages" 
+	     onstart="voteBlock.show();" oncomplete="voteBlock.hide();"/>
+	     your vote. If you are happy with your vote, please close this window to
+	      maintain the security of your vote.
+
+	     </h:panelGroup>
+	     </p:panelGrid>
+	     </h:form>
+	     <p:blockUI block="voteForm" widgetVar="voteBlock">
+	     <h:graphicImage library="img" name="ajax-loader.gif" />
+    </p:blockUI>
+	</ui:define>
+	
+</ui:composition>
+</html>

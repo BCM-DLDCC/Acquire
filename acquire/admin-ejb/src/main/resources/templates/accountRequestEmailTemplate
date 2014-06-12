@@ -1,0 +1,34 @@
+<html>
+<body>
+<p>
+Dear ${name},
+</p>
+
+<p>
+Your request for an Acquire account has been processed.
+</p>
+
+<p>
+Your login details for Acquire are:<br />
+Login Name: ${username}<br />
+
+Password: ${password}<br />
+
+</p>
+<p>
+To access the application, use the following link: 
+<a href="${server}">Acquire</a><br />
+ 
+The homepage contains brief instructions for use, and you may also download the 
+User Guide from the Help menu.<br />
+ 
+If you need to contact an administrator of the software, please email us at 
+<a href="mailto://emailAddress>
+emailAddress</a>.
+</p>
+ 
+<p>
+Thank you,<br />
+ 
+The Acquire Team
+</p>

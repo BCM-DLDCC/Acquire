@@ -1,0 +1,51 @@
+/* Core styles for the page */
+  .round {
+				-moz-border-radius: 10px;
+				border-radius: 10px;
+				margin-left:10px;
+				margin-right:10px;
+				}
+				 /*to style p:panelGrid*/
+		        .ui-panelgrid td {
+				    border:none;
+				    padding:4px 10px;
+				     vertical-align: top;
+				}
+				 .rf-ac {
+		        width: 500px;
+		        }
+		 
+		        .rf-ac-itm-c {
+		        height: 220px;
+		        }
+		        .logicParent {
+		         width:810px;border: 0px black dashed;
+		        }
+		        .logicParent td {
+		        vertical-align: top;
+		       
+		        }
+				.logicCheck {
+		        	width:50%;
+		         	vertical-align: top;
+		        }
+		        .logicInfo {
+		        	width:50%;
+		         	vertical-align: top;
+		        }
+		        
+		        
+		        .topAlign {
+		         width:810px;border: 0px black dashed;
+		        }
+		        .topAlign td {
+		        vertical-align: top;
+		       
+		        }
+		         .colA {
+		        width:200px;
+		         vertical-align: top;
+		        }
+		        .colA td {
+		         vertical-align: top;
+		        }

@@ -1,0 +1,20 @@
+<html>
+<body>
+<p>
+Dear ${name},
+</p>
+
+<p> 
+Your application for specimen, ${title}, from Acquire has been saved.  
+It has not been submitted to the Resource Allocation Committee for review yet.  
+You may continue to edit and make changes to your application through our website, 
+<a href="${server}">${server}</a>. When you have completed your application, 
+then you must click the Submit button prior to exiting the application. 
+Once you have submitted the application, it will be sent to the 
+Resource Allocation Committee for the review process.
+ </p>
+Regards,
+ <br />
+The Acquire Team
+</body>
+</html>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	>
+
+<h1>Specimen Updates</h1>
+
+	<p>The following specimens have been flagged for your attention.
+		You can filter by any of the columns to limit your view and export the
+		data to a file</p>
+	<h:form id = "specForm">
+	
+	
+				<p:selectOneMenu value="#{reportManager.collectionSite}"
+					id="specimenSites" widgetVar="specimenSites" style="width: 250px;">
+					<f:selectItem itemLabel="All Sites" itemValue="" />
+					<f:selectItems value="#{currentSites}" />
+				</p:selectOneMenu>
+				<p:commandButton value="Go" styleClass="qcReportSearchButton"
+				id="specimenReportSearchButton"
+				update="specimens"
+				action="#{reportManager.fetchNotifications}"
+				oncomplete = "disableEnterSubmit();" />
+				<br/>
+	
+	<p:scrollPanel mode="native">
+		<p:dataTable id="specimens" var="specimen" value="#{reportManager.notifications}"
+			paginatorPosition="bottom" paginator="true" rows="15"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+			widgetVar="specimenTable" styleClass="report"
+			filteredValue="#{reportManager.filteredNotifications}" 
+			currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+			>
+
+			<f:facet name="header">
+			Specimens
+			<div style="float: right;">
+					<h:outputText value="Search all fields " />
+					<h:inputText id="globalFilter" onkeyup="specimenTable.filter()" />
+				</div>
+			</f:facet>
+
+			<p:column id="label"
+				sortBy="#{specimen.specimenLabel}"
+				filterBy="#{specimen.specimenLabel}" filterMatchMode="contains" width = "110">
+				<f:facet name = "header"><h:outputText value = "Label"/></f:facet>
+				<h:outputLink target="popupWindow"
+				value="#{caTissueUrl}/SimpleSearchEdit.do">
+				  <f:param name="aliasName" value="Specimen" />
+				  <f:param name="id" value="#{specimen.inventoryId}" />
+				  #{specimen.specimenLabel}
+				</h:outputLink>
+			</p:column>
+
+			<p:column id="barcode" 
+				sortBy="#{specimen.specimenBarcode}"
+				filterBy="#{specimen.specimenBarcode}" filterMatchMode="contains" width = "110">
+				<f:facet name = "header"><h:outputText value = "Barcode"/></f:facet>
+				<h:outputText value="#{specimen.specimenBarcode}" />
+			</p:column>
+
+			<p:column id="caTissueId"
+				sortBy="#{specimen.inventoryId}" filterBy="#{specimen.inventoryId}" width = "110">
+				<f:facet name = "header"><h:outputText value = "caTissue ID"/></f:facet>
+				<h:outputText value="#{specimen.inventoryId}" />
+			</p:column>
+
+			<p:column id="uuid" 
+				sortBy="#{specimen.uuid}" filterBy="#{specimen.uuid}"
+				filterMatchMode="contains" width="125">
+				<f:facet name = "header"><h:outputText value = "Acquire UUID"/></f:facet>
+				<h:outputText value="#{specimen.uuid}" />
+			</p:column>
+
+			<p:column id="mrn" sortBy="#{specimen.concatenatedMrn}" 
+			filterBy="#{specimen.concatenatedMrn}" filterMatchMode="contains" 
+			width= "110">
+					<f:facet name = "header"><h:outputText value = "MRN"/></f:facet>
+					<h:outputLink value="#{caTissueUrl}/SimpleSearchEdit.do"
+					target="popupWindow">
+          <f:param name="aliasName" value="Participant" />
+          <f:param name="id" value="#{specimen.participantId}" />
+          #{specimen.concatenatedMrn}
+        </h:outputLink>
+			</p:column>
+			
+			<p:column id="type" 
+				sortBy="#{specimen.specimenType}"
+				filterBy="#{specimen.specimenType}" filterMatchMode="contains" width = "100">
+				<f:facet name = "header"><h:outputText value = "Type"/></f:facet>
+					<h:outputText value="#{specimen.specimenType}" />
+			</p:column>
+			<p:column id="status"
+				sortBy="#{specimen.concatenatedStatus}" 
+				filterBy="#{specimen.concatenatedStatus}" filterMatchMode= "contains"
+				width="100">
+				<f:facet name = "header"><h:outputText value = "Status"/></f:facet>
+					<h:outputText value="#{specimen.concatenatedStatus}" />
+		
+			</p:column>
+
+			<p:column id="date" width= "125"
+				sortBy="#{specimen.submissionDate}"
+				filterBy="#{specimen.submissionDate}" filterMatchMode="contains">
+				<f:facet name = "header"><h:outputText value = "Submission Date"/></f:facet>
+				<h:outputText value="#{specimen.submissionDate}">
+					<f:convertDateTime pattern="MM/dd/yyyy" />
+				</h:outputText>
+			</p:column>
+
+		</p:dataTable>
+</p:scrollPanel>
+		<br />
+		<br />
+		<p:commandButton value="Export" ajax="false"
+        onclick="PrimeFaces.monitorDownload(start, stop)" icon="ui-icon-arrowthick-1-s">
+          <p:fileDownload value="#{reportExporter.createUpdateFile}" />
+      </p:commandButton>
+
+		<p:blockUI block=":mainContent" trigger="specimens,specimenReportSearchButton">
+			<h:graphicImage library="img" name="ajax-loader.gif" />
+		</p:blockUI>
+	</h:form>
+	
+</ui:composition>
